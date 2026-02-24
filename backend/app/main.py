@@ -137,6 +137,9 @@ def create_app() -> FastAPI:
     from app.api.v1.gallery import router as gallery_router
     from app.api.v1.chatbot import router as chatbot_router
     from app.api.v1.admin import router as admin_router
+    from app.api.v1.admin_auth import router as admin_auth_router
+    from app.api.v1.sessions import router as sessions_router
+    from app.api.v1.alerts import router as alerts_router
 
     api_prefix = "/api/v1"
     app.include_router(auth_router, prefix=api_prefix)
@@ -147,6 +150,9 @@ def create_app() -> FastAPI:
     app.include_router(gallery_router, prefix=api_prefix)
     app.include_router(chatbot_router, prefix=api_prefix)
     app.include_router(admin_router, prefix=api_prefix)
+    app.include_router(admin_auth_router, prefix=api_prefix)
+    app.include_router(sessions_router, prefix=api_prefix)
+    app.include_router(alerts_router, prefix=api_prefix)
 
     # ── WebSocket routes ───────────────────────────────────
     from app.websocket.poll_ws import router as poll_ws_router

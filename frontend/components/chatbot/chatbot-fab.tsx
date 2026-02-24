@@ -13,10 +13,12 @@ export default function ChatbotFAB({ eventId }: { eventId: string }) {
 
   return (
     <>
+      <style>{`@media (max-width: 768px) { .chatbot-fab { bottom: 80px !important; } .chatbot-drawer { bottom: 152px !important; max-height: calc(100dvh - 176px) !important; } }`}</style>
       {/* FAB Button */}
       <motion.button
         onClick={toggleOpen}
         whileTap={{ scale: 0.9 }}
+        className="chatbot-fab"
         style={{
           position: "fixed", bottom: "24px", right: "24px", zIndex: 50,
           width: "56px", height: "56px", borderRadius: "50%",
@@ -38,6 +40,7 @@ export default function ChatbotFAB({ eventId }: { eventId: string }) {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ duration: 0.25 }}
+            className="chatbot-drawer"
             style={{
               position: "fixed", bottom: "96px", right: "24px", zIndex: 50,
               width: "380px", maxWidth: "calc(100vw - 48px)",
@@ -109,7 +112,7 @@ function ChatPanel({ eventId, token }: { eventId: string; token: string }) {
             <Bot style={{ width: "40px", height: "40px", color: "#ddd", margin: "0 auto 12px" }} />
             <p style={{ fontSize: "13px", color: "#999" }}>Ask me anything about the event!</p>
             <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", justifyContent: "center", marginTop: "16px" }}>
-              {["What's the schedule?", "Who are the speakers?", "What's the dress code?"].map((q) => (
+              {["What's the full event schedule?", "Tell me about the speakers", "What are the discussion topics?", "Venue & dress code details?"].map((q) => (
                 <button key={q} onClick={() => { handleSend(q); if (inputRef.current) inputRef.current.value = ""; }}
                   style={{ padding: "8px 14px", borderRadius: "999px", border: "1px solid #eee", background: "#fafafa", fontSize: "12px", color: "#555", cursor: "pointer" }}>
                   {q}

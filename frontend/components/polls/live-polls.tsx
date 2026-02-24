@@ -180,16 +180,41 @@ export default function LivePolls({ eventId }: { eventId: string }) {
 }
 
 const PollCard = memo(function PollCard({ poll, token }: { poll: import("@/lib/api").Poll; token: string }) {
-  const { markVoted, hasVoted: checkVoted } = usePollStore();
+  const { markVoted, hasVoted: checkVoted, getSelectedOption, updatePollVotes } = usePollStore();
   const voted = checkVoted(poll.id);
+  const selectedOption = getSelectedOption(poll.id);
+  const [pendingOption, setPendingOption] = useState<string | null>(null);
   const totalVotes = useMemo(() => poll.options.reduce((sum, o) => sum + o.vote_count, 0), [poll.options]);
 
   const handleVote = useCallback(async (optionId: string) => {
-    if (voted) return;
-    markVoted(poll.id);
-    try { await pollsApi.vote(poll.id, optionId, token); }
-    catch (err: unknown) { toast.error(err instanceof Error ? err.message : "Vote failed"); }
-  }, [poll.id, token, voted, markVoted]);
+    if (pendingOption) return; // prevent double-click while loading
+    if (selectedOption === optionId) return; // same option, no-op
+
+    setPendingOption(optionId);
+
+    // Optimistic update: immediately show the selection
+    markVoted(poll.id, optionId);
+
+    // Optimistic vote count update
+    const newVotes: Record<string, number> = {};
+    poll.options.forEach((opt) => {
+      let count = opt.vote_count;
+      if (opt.id === optionId) count += 1;
+      if (selectedOption && opt.id === selectedOption) count = Math.max(0, count - 1);
+      newVotes[opt.id] = count;
+    });
+    updatePollVotes(poll.id, newVotes);
+
+    try {
+      await pollsApi.vote(poll.id, optionId, token);
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : "Vote failed");
+    } finally {
+      setPendingOption(null);
+    }
+  }, [poll.id, poll.options, token, selectedOption, pendingOption, markVoted, updatePollVotes]);
+
+  const activeOption = pendingOption || selectedOption;
 
   return (
     <motion.div
@@ -204,21 +229,33 @@ const PollCard = memo(function PollCard({ poll, token }: { poll: import("@/lib/a
       <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
         {poll.options.map((opt) => {
           const pct = totalVotes > 0 ? (opt.vote_count / totalVotes) * 100 : 0;
+          const isSelected = activeOption === opt.id;
+          const isPending = pendingOption === opt.id;
           return (
-            <button key={opt.id} onClick={() => handleVote(opt.id)} disabled={voted || !poll.is_active}
+            <button key={opt.id} onClick={() => handleVote(opt.id)} disabled={!poll.is_active || isPending}
               style={{
                 position: "relative", width: "100%", overflow: "hidden", borderRadius: "14px",
-                padding: "16px 18px", textAlign: "left" as const, cursor: voted ? "default" : "pointer",
-                border: "1px solid #eee", background: "#fafafa", transition: "all 0.15s",
+                padding: "16px 18px", textAlign: "left" as const, cursor: isPending ? "wait" : "pointer",
+                border: isSelected ? "2px solid #DC143C" : "1px solid #eee",
+                background: isSelected ? "rgba(220,20,60,0.05)" : "#fafafa",
+                transition: "all 0.15s",
+                transform: isSelected ? "scale(1.01)" : "scale(1)",
               }}>
               <motion.div
-                style={{ position: "absolute", top: 0, left: 0, bottom: 0, background: "rgba(220,20,60,0.1)", borderRadius: "14px" }}
+                style={{ position: "absolute", top: 0, left: 0, bottom: 0, background: isSelected ? "rgba(220,20,60,0.15)" : "rgba(220,20,60,0.08)", borderRadius: "14px" }}
                 initial={{ width: 0 }}
                 animate={{ width: `${pct}%` }}
-                transition={{ duration: 0.8, ease: "easeOut" }}
+                transition={{ duration: 0.5, ease: "easeOut" }}
               />
               <div style={{ position: "relative", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                <span style={{ fontWeight: 500, fontSize: "14px", color: "#333" }}>{opt.option_text}</span>
+                <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                  {isSelected && (
+                    <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring", stiffness: 500 }}>
+                      <Check style={{ width: "16px", height: "16px", color: "#DC143C" }} />
+                    </motion.div>
+                  )}
+                  <span style={{ fontWeight: isSelected ? 600 : 500, fontSize: "14px", color: isSelected ? "#8B0000" : "#333" }}>{opt.option_text}</span>
+                </div>
                 <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
                   <span style={{ fontSize: "14px", color: "#8B0000", fontWeight: 700, fontFamily: "monospace" }}>{pct.toFixed(1)}%</span>
                   <span style={{ fontSize: "12px", color: "#999", fontFamily: "monospace" }}>({opt.vote_count})</span>
@@ -233,6 +270,7 @@ const PollCard = memo(function PollCard({ poll, token }: { poll: import("@/lib/a
         <span style={{ color: "#999" }}>{totalVotes} total vote{totalVotes !== 1 ? "s" : ""}</span>
         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
           {voted && <span style={{ display: "flex", alignItems: "center", gap: "4px", color: "#22c55e", fontWeight: 500 }}><Check style={{ width: "14px", height: "14px" }} />Voted</span>}
+          {voted && <span style={{ color: "#aaa", fontSize: "11px" }}>· Tap another to change</span>}
           <span style={{ display: "flex", alignItems: "center", gap: "4px", color: "#DC143C", fontSize: "11px", fontWeight: 500 }}>
             <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#DC143C", animation: "pulse 2s infinite" }} />
             Auto-refreshing

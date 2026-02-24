@@ -30,6 +30,8 @@ class Event(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     registrations = relationship("Registration", back_populates="event", lazy="noload")
     polls = relationship("Poll", back_populates="event", lazy="noload")
     feedback_entries = relationship("Feedback", back_populates="event", lazy="noload")
+    sessions = relationship("Session", back_populates="event", lazy="noload")
+    alerts = relationship("Alert", back_populates="event", lazy="noload")
 
     __table_args__ = (
         Index("ix_events_slug", "slug", unique=True),

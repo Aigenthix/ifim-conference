@@ -31,11 +31,20 @@ export default function CertificateSection({ eventId }: { eventId: string }) {
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = "certificate.pdf";
+
+      // Detect file type from URL or content type
+      const contentType = res.headers.get("content-type") || "";
+      const isImage = contentType.startsWith("image/") || cert.pdf_url.includes("/image/");
+      a.download = isImage ? "certificate.jpg" : "certificate.pdf";
+
       document.body.appendChild(a);
       a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
+      
+      // Delay cleanup to ensure mobile browsers actually start the download before the blob is destroyed
+      setTimeout(() => {
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }, 5000);
     } catch (err) {
       console.error("Download error:", err);
     } finally {
@@ -54,7 +63,7 @@ export default function CertificateSection({ eventId }: { eventId: string }) {
       <div style={{ borderRadius: "20px", background: "#fff", border: "1px solid #eee", padding: "60px 24px", textAlign: "center", maxWidth: "480px", margin: "0 auto", boxShadow: "0 2px 12px rgba(0,0,0,0.04)" }}>
         <Award style={{ width: "48px", height: "48px", color: "#ccc", margin: "0 auto 16px" }} />
         <h3 style={{ fontSize: "18px", fontWeight: 600, color: "#333", marginBottom: "8px" }}>Certificate Not Available</h3>
-        <p style={{ color: "#888", fontSize: "14px" }}>Submit feedback first to receive your certificate.</p>
+        <p style={{ color: "#888", fontSize: "14px" }}>Your certificate will be available after the event.</p>
       </div>
     );
   }
@@ -81,7 +90,7 @@ export default function CertificateSection({ eventId }: { eventId: string }) {
                 opacity: downloading ? 0.7 : 1,
               }}>
               {downloading ? <><Loader2 style={{ width: "16px", height: "16px" }} className="animate-spin" /> Downloading...</> :
-                <><Download style={{ width: "16px", height: "16px" }} /> Download PDF</>}
+                <><Download style={{ width: "16px", height: "16px" }} /> Download Certificate</>}
             </button>
           </>
         ) : cert.status === "pending" || cert.status === "generating" ? (

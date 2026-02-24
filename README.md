@@ -1,8 +1,6 @@
 # Event Platform
 
-A production-grade, horizontally-scalable event platform consisting of a Next.js frontend and a FastAPI backend. Designed to handle high concurrency (3–5 lakh concurrent users per event).
-
-## Architecture & Tech Stack
+A production-grade, event platform consisting of a Next.js frontend and a FastAPI backend. Designed to handle high concurrency Architecture & Tech Stack.
 
 ### Frontend
 
@@ -63,6 +61,13 @@ Redis plays a crucial role in maintaining performance under extreme load:
 2. `npm install`
 3. `npm run dev`
 4. Access the client app at `http://localhost:3000`
+
+### Admin Access
+
+By default, the database is seeded with the following admin credentials:
+
+- **Email:** `admin@rajdarbar.com`
+- **Password:** `RajDarbar2026!`
 
 ---
 

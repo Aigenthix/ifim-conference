@@ -53,6 +53,14 @@ class Settings(BaseSettings):
     GALLERY_DIR: str = "./uploads/gallery"
     GALLERY_DRIVE_FOLDER_URL: str = ""
 
+    # ── Admin ──────────────────────────────────────────────
+    ADMIN_DEFAULT_EMAIL: str = "admin@rajdarbar.com"
+    ADMIN_DEFAULT_PASSWORD: str = "RajDarbar2026!"
+
+    # ── Media URLs (configurable) ──────────────────────────
+    GOOGLE_DRIVE_FOLDER_URL: str = "https://drive.google.com/drive/folders/13nx-8JCobjKKSahGTj49s5SAOok098lw"
+    YOUTUBE_CHANNEL_URL: str = "https://youtu.be/KSkqxoWA8is"
+
     # ── Email ──────────────────────────────────────────────
     SMTP_HOST: str = "smtp.gmail.com"
     SMTP_PORT: int = 587

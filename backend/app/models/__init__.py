@@ -12,6 +12,8 @@ from app.models.feedback import Feedback
 from app.models.certificate import Certificate
 from app.models.chat_log import ChatLog
 from app.models.admin import AdminUser
+from app.models.session import Session
+from app.models.alert import Alert
 
 __all__ = [
     "User",
@@ -24,4 +26,6 @@ __all__ = [
     "Certificate",
     "ChatLog",
     "AdminUser",
+    "Session",
+    "Alert",
 ]

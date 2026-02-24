@@ -66,3 +66,38 @@ async def download_certificate(
         filename=filename,
         media_type="application/pdf",
     )
+
+
+@router.get(
+    "/image/{event_id}/{filename:path}",
+    summary="Download certificate image",
+    response_class=FileResponse,
+)
+async def download_certificate_image(
+    event_id: uuid.UUID,
+    filename: str,
+    user: CurrentUser,
+) -> FileResponse:
+    """Serve certificate image (JPG) from local disk."""
+    settings = get_settings()
+
+    cert_path = Path(settings.CERTIFICATES_DIR) / str(event_id) / filename
+
+    # Security: prevent path traversal
+    try:
+        cert_path.resolve().relative_to(Path(settings.CERTIFICATES_DIR).resolve())
+    except ValueError:
+        raise NotFoundError("Certificate not found")
+
+    if not cert_path.exists():
+        raise NotFoundError("Certificate not found")
+
+    # Determine media type
+    suffix = cert_path.suffix.lower()
+    media_type = "image/jpeg" if suffix in (".jpg", ".jpeg") else "image/png"
+
+    return FileResponse(
+        path=str(cert_path),
+        filename=filename,
+        media_type=media_type,
+    )

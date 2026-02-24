@@ -1,6 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  output: "standalone",
   images: {
     remotePatterns: [
       {
@@ -8,16 +9,12 @@ const nextConfig: NextConfig = {
         hostname: "localhost",
         port: "8000",
       },
-    ],
-  },
-
-  async rewrites() {
-    return [
       {
-        source: "/api/:path*",
-        destination: `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/api/:path*`,
+        protocol: "http",
+        hostname: "ec2-35-154-105-102.ap-south-1.compute.amazonaws.com",
+        port: "8000",
       },
-    ];
+    ],
   },
 };
 

@@ -6,9 +6,15 @@ without touching any business logic.
 """
 from __future__ import annotations
 
+import json
+import logging
+import time
+
 import httpx
 
 from app.core.config import get_settings
+
+logger = logging.getLogger(__name__)
 
 
 async def generate_response(query: str, context: str) -> str:
@@ -60,3 +66,114 @@ async def generate_response(query: str, context: str) -> str:
                 return parts[0].get("text", "I couldn't generate a response.")
 
         return "I couldn't generate a response. Please try again."
+
+
+def _extract_json_object(raw_text: str) -> dict | None:
+    """
+    Gemini can occasionally wrap JSON in prose; this extracts
+    the first JSON object-like block safely.
+    """
+    if not raw_text:
+        return None
+
+    candidate = raw_text.strip()
+    try:
+        return json.loads(candidate)
+    except json.JSONDecodeError:
+        pass
+
+    start = candidate.find("{")
+    end = candidate.rfind("}")
+    if start == -1 or end == -1 or end <= start:
+        return None
+
+    snippet = candidate[start : end + 1]
+    try:
+        return json.loads(snippet)
+    except json.JSONDecodeError:
+        return None
+
+
+async def generate_strategy_compass_topics(count: int = 8) -> list[dict[str, str]]:
+    """
+    Generate random AI-in-BFSI strategy topics for the spin wheel.
+
+    Returns an empty list if generation fails, so callers can
+    gracefully fall back to static topics.
+    """
+    settings = get_settings()
+    if not settings.GEMINI_API_KEY:
+        return []
+
+    prompt = (
+        "You are creating content for an interactive spin wheel.\n"
+        f"Generate exactly {count} unique AI in BFSI topics.\n"
+        "Mandatory coverage: Algorithmic Trading, KYC Automation, Debt Collection AI, "
+        "Synthetic Data for Privacy, ESG Scoring, and Claims Processing.\n"
+        "Output STRICT JSON only with this shape:\n"
+        '{ "topics": [ { "title": "string", "explanation": "one sentence" } ] }\n'
+        "Rules:\n"
+        "- title: concise, 3-8 words\n"
+        "- explanation: exactly one sentence, 14-28 words, practical business impact\n"
+        "- no markdown, no numbering, no extra keys\n"
+        f"- randomization seed: {time.time_ns()}"
+    )
+
+    try:
+        async with httpx.AsyncClient() as client:
+            response = await client.post(
+                f"https://generativelanguage.googleapis.com/v1beta/models/{settings.LLM_MODEL}:generateContent",
+                params={"key": settings.GEMINI_API_KEY},
+                headers={"Content-Type": "application/json"},
+                json={
+                    "contents": [
+                        {
+                            "role": "user",
+                            "parts": [{"text": prompt}],
+                        }
+                    ],
+                    "generationConfig": {
+                        "temperature": 1.0,
+                        "maxOutputTokens": 900,
+                        "responseMimeType": "application/json",
+                    },
+                },
+                timeout=30.0,
+            )
+            response.raise_for_status()
+            data = response.json()
+    except Exception:
+        logger.exception("Gemini generation failed for strategy compass topics")
+        return []
+
+    candidates = data.get("candidates", [])
+    if not candidates:
+        return []
+
+    raw_text = ""
+    parts = candidates[0].get("content", {}).get("parts", [])
+    if parts:
+        raw_text = parts[0].get("text", "")
+
+    parsed = _extract_json_object(raw_text)
+    if not parsed:
+        return []
+
+    topics = parsed.get("topics")
+    if not isinstance(topics, list):
+        return []
+
+    cleaned: list[dict[str, str]] = []
+    seen_titles: set[str] = set()
+    for item in topics:
+        if not isinstance(item, dict):
+            continue
+        title = str(item.get("title", "")).strip()
+        explanation = str(item.get("explanation", "")).strip()
+        normalized = title.casefold()
+        if not title or not explanation or normalized in seen_titles:
+            continue
+        seen_titles.add(normalized)
+        cleaned.append({"title": title, "explanation": explanation})
+
+    return cleaned

@@ -58,14 +58,14 @@ export default function RegisterPage({ params }: { params: Promise<{ slug: strin
       <div style={{ position: "absolute", top: "-100px", right: "-100px", width: "350px", height: "350px", borderRadius: "50%", background: "rgba(255,255,255,0.02)" }} />
       <div style={{ position: "absolute", bottom: "-80px", left: "-80px", width: "280px", height: "280px", borderRadius: "50%", background: "rgba(255,255,255,0.015)" }} />
 
-      {/* RD Badge */}
-      <div style={{
-        width: "56px", height: "56px", borderRadius: "16px",
-        background: "#fff", color: "#000",
-        display: "flex", alignItems: "center", justifyContent: "center",
-        fontWeight: 800, fontSize: "18px", marginBottom: "20px",
-        boxShadow: "0 8px 32px rgba(255,255,255,0.1)",
-      }}>RD</div>
+      {/* Logo */}
+      <img src="/logo.png" alt="Raj Darbar 2026" style={{
+        width: "200px", height: "auto", marginBottom: "24px",
+        borderRadius: "16px",
+        background: "rgba(255,255,255,0.95)",
+        padding: "10px 14px",
+        boxShadow: "0 8px 32px rgba(255,255,255,0.15)",
+      }} />
 
       <h1 style={{ fontSize: "28px", fontWeight: 800, color: "#fff", marginBottom: "6px", textAlign: "center" }}>
         Join RAJ DARBAR 2026

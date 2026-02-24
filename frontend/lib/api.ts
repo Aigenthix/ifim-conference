@@ -65,6 +65,8 @@ export const authApi = {
 export const eventsApi = {
   getLobby: (slug: string, token: string) =>
     request<EventLobby>(`/api/v1/events/${slug}/lobby`, { token }),
+  getStrategyCompassTopics: (slug: string, token: string, count = 8) =>
+    request<StrategyCompassTopicsResponse>(`/api/v1/events/${slug}/strategy-compass-topics?count=${count}`, { token }),
 };
 
 // ── Polls ─────────────────────────────────────────────────
@@ -92,7 +94,7 @@ export const pollsApi = {
 // ── Feedback ──────────────────────────────────────────────
 export const feedbackApi = {
   submit: (data: { event_id: string; rating: number; comments?: string }, token: string) =>
-    request<FeedbackResponse>("/api/v1/feedback", { method: "POST", body: data, token }),
+    request<FeedbackResponse>("/api/v1/feedback/", { method: "POST", body: data, token }),
   check: (eventId: string, token: string) =>
     request<{ submitted: boolean; rating?: number; comments?: string }>(`/api/v1/feedback/check/${eventId}`, { token }),
 };
@@ -119,6 +121,29 @@ export const chatbotApi = {
 export const adminApi = {
   getDashboard: (eventId: string, token: string) =>
     request<Dashboard>(`/api/v1/admin/dashboard/${eventId}`, { token }),
+  login: (email: string, password: string) =>
+    request<AdminLoginResponse>("/api/v1/admin/login", {
+      method: "POST",
+      body: { email, password },
+    }),
+};
+
+// ── Sessions ──────────────────────────────────────────────
+export const sessionsApi = {
+  getEventSessions: (eventId: string, token: string) =>
+    request<{ sessions: SessionItem[] }>(`/api/v1/sessions/event/${eventId}`, { token }),
+  create: (data: { event_id: string; title: string; speaker_name?: string; speaker_title?: string; day: number; display_order?: number; audio_url?: string; video_url?: string }, token: string) =>
+    request<SessionItem>("/api/v1/sessions/", { method: "POST", body: data, token }),
+  delete: (sessionId: string, token: string) =>
+    request<void>(`/api/v1/sessions/${sessionId}`, { method: "DELETE", token }),
+};
+
+// ── Alerts ────────────────────────────────────────────────
+export const alertsApi = {
+  getEventAlerts: (eventId: string, token: string) =>
+    request<{ alerts: AlertItem[] }>(`/api/v1/alerts/event/${eventId}`, { token }),
+  create: (data: { event_id: string; title: string; message: string; is_pinned?: boolean }, token: string) =>
+    request<AlertItem>("/api/v1/alerts/", { method: "POST", body: data, token }),
 };
 
 // ── Types ─────────────────────────────────────────────────
@@ -133,6 +158,15 @@ export type EventLobby = {
   starts_at: string;
   ends_at: string;
   is_active: boolean;
+};
+
+export type StrategyCompassTopic = {
+  title: string;
+  explanation: string;
+};
+
+export type StrategyCompassTopicsResponse = {
+  topics: StrategyCompassTopic[];
 };
 
 export type PollOption = {
@@ -187,6 +221,36 @@ export type Dashboard = {
   average_rating: number;
   total_queries: number;
   top_queries: string[];
+};
+
+export type AdminLoginResponse = {
+  token: string;
+  admin_id: string;
+  email: string;
+  role: string;
+};
+
+export type SessionItem = {
+  id: string;
+  event_id: string;
+  title: string;
+  speaker_name: string | null;
+  speaker_title: string | null;
+  day: number;
+  display_order: number;
+  audio_url: string | null;
+  video_url: string | null;
+  is_active: boolean;
+  created_at: string;
+};
+
+export type AlertItem = {
+  id: string;
+  event_id: string;
+  title: string;
+  message: string;
+  is_pinned: boolean;
+  created_at: string;
 };
 
 export { ApiError };

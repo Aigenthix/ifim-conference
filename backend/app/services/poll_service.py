@@ -96,11 +96,10 @@ class PollService:
             raise RateLimitError("Please wait before voting again")
         await self._redis.setex(rate_key, 1, "1")
 
-        # 2. Dedup
+        # 2. Check previous vote (allow changing)
         voters_key = f"poll:{poll_id}:voters"
-        already_voted = await self._redis.sismember(voters_key, str(user_id))
-        if already_voted:
-            raise ConflictError("You have already voted on this poll")
+        prev_option_key = f"poll:{poll_id}:voter:{user_id}"
+        previous_option = await self._redis.get(prev_option_key)
 
         # 3. Validate poll exists
         poll = await self._repo.get_with_options(poll_id)
@@ -114,12 +113,39 @@ class PollService:
         if str(vote.option_id) not in valid_option_ids:
             raise NotFoundError("Invalid poll option")
 
-        # 4. Atomic increment + add to voter set (pipeline for atomicity)
+        # If voting for the same option, no-op
+        if previous_option and previous_option == str(vote.option_id):
+            return VoteResponse(poll_id=poll_id, option_id=vote.option_id)
+
+        # 4. Atomic swap: decrement old option (if any), increment new option
         votes_key = f"poll:{poll_id}:votes"
         async with self._redis.pipeline(transaction=True) as pipe:
+            if previous_option:
+                pipe.hincrby(votes_key, previous_option, -1)
             pipe.hincrby(votes_key, str(vote.option_id), 1)
             pipe.sadd(voters_key, str(user_id))
+            pipe.set(prev_option_key, str(vote.option_id))
             await pipe.execute()
+
+        # 4b. Persist to PostgreSQL (upsert — update if user changes vote)
+        from sqlalchemy.dialects.postgresql import insert as pg_insert
+        from sqlalchemy import func
+        from app.models.poll import PollVote
+
+        stmt = pg_insert(PollVote).values(
+            id=uuid.uuid4(),
+            poll_id=poll_id,
+            option_id=vote.option_id,
+            user_id=user_id,
+        ).on_conflict_do_update(
+            constraint="uq_poll_vote_user",
+            set_={
+                "option_id": vote.option_id,
+                "voted_at": func.now(),
+            },
+        )
+        await self._repo._session.execute(stmt)
+        await self._repo._session.commit()
 
         # 5. Publish update for WebSocket subscribers
         await self._redis.publish(

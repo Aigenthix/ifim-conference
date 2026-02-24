@@ -4,13 +4,14 @@ import type { Poll } from "@/lib/api";
 
 type PollState = {
   polls: Poll[];
-  votedPolls: string[];
+  votedPolls: Record<string, string>; // pollId -> selectedOptionId
   rotationStartTime: number; // epoch ms — persisted so timer doesn't reset
 
   setPolls: (polls: Poll[]) => void;
   updatePollVotes: (pollId: string, votes: Record<string, number>) => void;
-  markVoted: (pollId: string) => void;
+  markVoted: (pollId: string, optionId: string) => void;
   hasVoted: (pollId: string) => boolean;
+  getSelectedOption: (pollId: string) => string | null;
   getRotationStart: () => number;
 };
 
@@ -18,7 +19,7 @@ export const usePollStore = create<PollState>()(
   persist(
     (set, get) => ({
       polls: [],
-      votedPolls: [],
+      votedPolls: {},
       rotationStartTime: Date.now(),
 
       setPolls: (polls) => set((state) => {
@@ -41,13 +42,13 @@ export const usePollStore = create<PollState>()(
           }),
         })),
 
-      markVoted: (pollId) =>
-        set((state) => {
-          if (state.votedPolls.includes(pollId)) return state;
-          return { votedPolls: [...state.votedPolls, pollId] };
-        }),
+      markVoted: (pollId, optionId) =>
+        set((state) => ({
+          votedPolls: { ...state.votedPolls, [pollId]: optionId },
+        })),
 
-      hasVoted: (pollId) => get().votedPolls.includes(pollId),
+      hasVoted: (pollId) => pollId in get().votedPolls,
+      getSelectedOption: (pollId) => get().votedPolls[pollId] ?? null,
       getRotationStart: () => get().rotationStartTime,
     }),
     {
