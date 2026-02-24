@@ -1,0 +1,40 @@
+# Core
+fastapi[standard]
+uvicorn[standard]
+python-multipart
+
+# Database
+sqlalchemy[asyncio]
+asyncpg
+alembic
+pgvector
+
+# Redis
+redis[hiredis]
+
+# Auth & Security
+python-jose[cryptography]
+passlib[bcrypt]
+
+# Background Workers
+celery[redis]
+
+# PDF Generation
+reportlab
+
+# AI / LLM (Gemini)
+google-generativeai
+httpx
+
+# Email
+aiosmtplib
+aiofiles
+
+# Utilities
+pydantic[email]
+pydantic-settings
+structlog
+
+# Testing
+pytest
+pytest-asyncio
