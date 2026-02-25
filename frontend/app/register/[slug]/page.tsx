@@ -50,7 +50,7 @@ export default function RegisterPage({ params }: { params: Promise<{ slug: strin
     <main style={{
       minHeight: "100dvh", display: "flex", flexDirection: "column",
       alignItems: "center", justifyContent: "center", padding: "24px",
-      background: "linear-gradient(165deg, #0a0a0a 0%, #1a1a1a 40%, #111 70%, #0a0a0a 100%)",
+      background: "linear-gradient(165deg, #8B0000 0%, #DC143C 40%, #B22222 70%, #8B0000 100%)",
       fontFamily: "'Inter', -apple-system, sans-serif",
       position: "relative", overflow: "hidden",
     }}>

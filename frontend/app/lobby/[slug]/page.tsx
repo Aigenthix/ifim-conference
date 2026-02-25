@@ -119,14 +119,17 @@ export default function LobbyPage({ params }: { params: Promise<{ slug: string }
               const isActive = active === s.id;
               return (
                 <button key={s.id} onClick={() => setActive(s.id)} style={{
-                  display: "flex", alignItems: "center", gap: "6px",
-                  padding: "8px 14px", borderRadius: "10px", border: "none", cursor: "pointer",
-                  fontSize: "13px", fontWeight: isActive ? 600 : 400,
+                  display: "flex", alignItems: "center", gap: "4px", // Reduced from 6px
+                  padding: "6px 10px", // Reduced from 8px 14px
+                  borderRadius: "8px", border: "none", cursor: "pointer",
+                  fontSize: "12px", // Slightly smaller text to fit more tabs
+                  fontWeight: isActive ? 600 : 400,
                   color: isActive ? "#fff" : "rgba(255,255,255,0.7)",
                   background: isActive ? "rgba(255,255,255,0.2)" : "transparent",
                   transition: "all 0.15s",
+                  minWidth: "max-content", // Prevent text wrapping
                 }}>
-                  <Icon style={{ width: "15px", height: "15px" }} />{s.label}
+                  <Icon style={{ width: "14px", height: "14px" }} />{s.label}
                 </button>
               );
             })}

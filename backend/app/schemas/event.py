@@ -5,7 +5,7 @@ import uuid
 from datetime import datetime
 from typing import Any
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 
 class EventLobbyResponse(BaseModel):
@@ -43,6 +43,18 @@ class StrategyCompassTopic(BaseModel):
 
     title: str = Field(..., min_length=3, max_length=120)
     explanation: str = Field(..., min_length=20, max_length=280)
+    how_it_works: str = Field(..., min_length=40, max_length=500)
+    business_impact: str = Field(..., min_length=40, max_length=500)
+    implementation_steps: list[str] = Field(..., min_length=3, max_length=5)
+    kpis: list[str] = Field(..., min_length=3, max_length=5)
+
+    @field_validator("implementation_steps", "kpis")
+    @classmethod
+    def validate_text_list(cls, value: list[str]) -> list[str]:
+        cleaned = [str(item).strip() for item in value if str(item).strip()]
+        if len(cleaned) < 3:
+            raise ValueError("At least 3 items are required")
+        return cleaned[:5]
 
 
 class StrategyCompassTopicsResponse(BaseModel):

@@ -3,9 +3,16 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { eventsApi, type StrategyCompassTopic } from "@/lib/api";
 
-type BfsiTopic = StrategyCompassTopic;
+type BfsiTopic = {
+  title: string;
+  explanation: string;
+  how_it_works: string;
+  business_impact: string;
+  implementation_steps: string[];
+  kpis: string[];
+};
 
-const FALLBACK_TOPIC_POOL: BfsiTopic[] = [
+const FALLBACK_TOPIC_POOL: StrategyCompassTopic[] = [
   {
     title: "Algorithmic Trading Co-Pilots",
     explanation: "AI detects micro-patterns in market data and supports disciplined, faster execution decisions for trading teams.",
@@ -120,35 +127,97 @@ function topicsFingerprint(topics: BfsiTopic[]): string {
   return topics.map((topic) => topic.title.toLowerCase()).sort().join("|");
 }
 
-function normalizeTopics(topics: BfsiTopic[]): BfsiTopic[] {
+function normalizeTextList(
+  input: string[] | undefined,
+  fallback: string[],
+): string[] {
+  if (!Array.isArray(input)) {
+    return fallback;
+  }
+
+  const cleaned = input
+    .map((value) => String(value).trim())
+    .filter((value, index, arr) => value.length > 0 && arr.indexOf(value) === index);
+
+  return cleaned.length >= 3 ? cleaned.slice(0, 5) : fallback;
+}
+
+function buildDefaultHowItWorks(title: string, explanation: string): string {
+  return `${explanation} The workflow combines historical data, real-time signals, and policy rules to guide teams with human approvals for high-risk cases.`;
+}
+
+function buildDefaultBusinessImpact(title: string): string {
+  return `${title} reduces manual effort, improves decision consistency, and accelerates response times across BFSI operations. It typically increases conversion, recovery, or fraud-control performance with clearer risk visibility.`;
+}
+
+function buildDefaultImplementationSteps(title: string): string[] {
+  const lowered = title.toLowerCase();
+  return [
+    `Define the ${lowered} use case, owners, and baseline metrics.`,
+    "Consolidate clean historical data and validate model quality with domain experts.",
+    "Pilot in one business unit with human-in-the-loop review before full rollout.",
+  ];
+}
+
+function buildDefaultKpis(): string[] {
+  return [
+    "Turnaround time reduction (%)",
+    "Accuracy or error-rate improvement (%)",
+    "Cost-to-serve per case",
+  ];
+}
+
+function toDetailedTopic(topic: StrategyCompassTopic): BfsiTopic | null {
+  const title = topic.title?.trim();
+  const explanation = topic.explanation?.trim();
+  if (!title || !explanation) {
+    return null;
+  }
+
+  const implementationStepsFallback = buildDefaultImplementationSteps(title);
+  return {
+    title,
+    explanation,
+    how_it_works: topic.how_it_works?.trim() || buildDefaultHowItWorks(title, explanation),
+    business_impact: topic.business_impact?.trim() || buildDefaultBusinessImpact(title),
+    implementation_steps: normalizeTextList(
+      topic.implementation_steps,
+      implementationStepsFallback,
+    ),
+    kpis: normalizeTextList(topic.kpis, buildDefaultKpis()),
+  };
+}
+
+function normalizeTopics(topics: StrategyCompassTopic[]): BfsiTopic[] {
   const unique: BfsiTopic[] = [];
   const seen = new Set<string>();
   for (const topic of topics) {
-    const title = topic.title?.trim();
-    const explanation = topic.explanation?.trim();
-    if (!title || !explanation) {
+    const detailed = toDetailedTopic(topic);
+    if (!detailed) {
       continue;
     }
-    const key = title.toLowerCase();
+    const key = detailed.title.toLowerCase();
     if (seen.has(key)) {
       continue;
     }
     seen.add(key);
-    unique.push({ title, explanation });
+    unique.push(detailed);
   }
   return unique;
 }
+
+const DETAILED_FALLBACK_TOPICS = normalizeTopics(FALLBACK_TOPIC_POOL);
 
 function buildWheelTopics(
   sourceTopics: BfsiTopic[],
   previous: BfsiTopic[] = [],
 ): BfsiTopic[] {
-  const targetCount = Math.min(SEGMENT_COUNT, FALLBACK_TOPIC_POOL.length);
-  const normalizedSource = normalizeTopics(sourceTopics).slice(0, targetCount);
+  const targetCount = Math.min(SEGMENT_COUNT, DETAILED_FALLBACK_TOPICS.length);
+  const normalizedSource = sourceTopics.slice(0, targetCount);
   const seen = new Set(normalizedSource.map((topic) => topic.title.toLowerCase()));
   const candidate = [...normalizedSource];
 
-  for (const fallback of shuffle(FALLBACK_TOPIC_POOL)) {
+  for (const fallback of shuffle(DETAILED_FALLBACK_TOPICS)) {
     if (candidate.length >= targetCount) {
       break;
     }
@@ -165,7 +234,7 @@ function buildWheelTopics(
     topicsFingerprint(candidate) === topicsFingerprint(previous)
   ) {
     for (let attempt = 0; attempt < 5; attempt += 1) {
-      const reshuffled = buildWheelTopics(shuffle(FALLBACK_TOPIC_POOL), []);
+      const reshuffled = buildWheelTopics(shuffle(DETAILED_FALLBACK_TOPICS), []);
       if (topicsFingerprint(reshuffled) !== topicsFingerprint(previous)) {
         return reshuffled;
       }
@@ -180,7 +249,7 @@ export default function StrategyCompassSection({
   token,
 }: StrategyCompassSectionProps) {
   const [wheelTopics, setWheelTopics] = useState<BfsiTopic[]>(() =>
-    buildWheelTopics(FALLBACK_TOPIC_POOL)
+    buildWheelTopics(DETAILED_FALLBACK_TOPICS)
   );
   const [rotation, setRotation] = useState(0);
   const [spinsUsed, setSpinsUsed] = useState(0);
@@ -227,7 +296,7 @@ export default function StrategyCompassSection({
     setIsLoadingTopics(true);
 
     if (!eventSlug || !token) {
-      const fallbackTopics = buildWheelTopics(FALLBACK_TOPIC_POOL, previousTopics);
+      const fallbackTopics = buildWheelTopics(DETAILED_FALLBACK_TOPICS, previousTopics);
       if (mountedRef.current) {
         setWheelTopics(fallbackTopics);
         setIsLoadingTopics(false);
@@ -237,7 +306,7 @@ export default function StrategyCompassSection({
 
     try {
       const response = await eventsApi.getStrategyCompassTopics(eventSlug, token, SEGMENT_COUNT);
-      const nextTopics = buildWheelTopics(response.topics, previousTopics);
+      const nextTopics = buildWheelTopics(normalizeTopics(response.topics), previousTopics);
 
       if (!mountedRef.current || fetchRequestIdRef.current !== requestId) {
         return;
@@ -248,7 +317,7 @@ export default function StrategyCompassSection({
       if (!mountedRef.current || fetchRequestIdRef.current !== requestId) {
         return;
       }
-      const fallbackTopics = buildWheelTopics(FALLBACK_TOPIC_POOL, previousTopics);
+      const fallbackTopics = buildWheelTopics(DETAILED_FALLBACK_TOPICS, previousTopics);
       setWheelTopics(fallbackTopics);
     } finally {
       if (mountedRef.current && fetchRequestIdRef.current === requestId) {
@@ -486,21 +555,79 @@ export default function StrategyCompassSection({
         >
           <div
             style={{
-              width: "min(500px, 100%)",
+              width: "min(760px, 100%)",
+              maxHeight: "84vh",
+              overflowY: "auto",
               borderRadius: "14px",
               background: "#fff",
               padding: "20px",
               boxShadow: "0 14px 32px rgba(0,0,0,0.2)",
               display: "flex",
               flexDirection: "column",
-              gap: "10px",
+              gap: "12px",
             }}
           >
             <p style={{ fontSize: "12px", color: "#8B0000", fontWeight: 700, letterSpacing: "0.06em" }}>
               SELECTED TOPIC
             </p>
-            <h3 style={{ fontSize: "21px", color: "#111", lineHeight: 1.25 }}>{selectedTopic.title}</h3>
-            <p style={{ color: "#4a4a4a", fontSize: "14px", lineHeight: 1.6 }}>{selectedTopic.explanation}</p>
+            <h3 style={{ fontSize: "24px", color: "#111", lineHeight: 1.25 }}>{selectedTopic.title}</h3>
+            <p style={{ color: "#4a4a4a", fontSize: "15px", lineHeight: 1.7 }}>{selectedTopic.explanation}</p>
+
+            <div style={{ borderTop: "1px solid #eee", paddingTop: "10px", display: "flex", flexDirection: "column", gap: "10px" }}>
+              <div>
+                <p style={{ fontSize: "12px", color: "#8B0000", fontWeight: 700, letterSpacing: "0.05em", marginBottom: "4px" }}>
+                  HOW IT WORKS
+                </p>
+                <p style={{ color: "#333", fontSize: "14px", lineHeight: 1.65 }}>
+                  {selectedTopic.how_it_works}
+                </p>
+              </div>
+
+              <div>
+                <p style={{ fontSize: "12px", color: "#8B0000", fontWeight: 700, letterSpacing: "0.05em", marginBottom: "4px" }}>
+                  BUSINESS IMPACT
+                </p>
+                <p style={{ color: "#333", fontSize: "14px", lineHeight: 1.65 }}>
+                  {selectedTopic.business_impact}
+                </p>
+              </div>
+
+              <div>
+                <p style={{ fontSize: "12px", color: "#8B0000", fontWeight: 700, letterSpacing: "0.05em", marginBottom: "4px" }}>
+                  IMPLEMENTATION PLAYBOOK
+                </p>
+                <ol style={{ margin: 0, paddingLeft: "18px", color: "#333", fontSize: "14px", lineHeight: 1.65 }}>
+                  {selectedTopic.implementation_steps.map((step) => (
+                    <li key={step}>{step}</li>
+                  ))}
+                </ol>
+              </div>
+
+              <div>
+                <p style={{ fontSize: "12px", color: "#8B0000", fontWeight: 700, letterSpacing: "0.05em", marginBottom: "6px" }}>
+                  KPIS TO TRACK
+                </p>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
+                  {selectedTopic.kpis.map((kpi) => (
+                    <span
+                      key={kpi}
+                      style={{
+                        border: "1px solid #efc7c7",
+                        borderRadius: "999px",
+                        background: "#fff5f5",
+                        color: "#7f1d1d",
+                        fontSize: "12px",
+                        fontWeight: 600,
+                        padding: "6px 10px",
+                      }}
+                    >
+                      {kpi}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
+
             <div style={{ marginTop: "4px" }}>
               <button
                 type="button"

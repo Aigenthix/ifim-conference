@@ -94,7 +94,7 @@ def _extract_json_object(raw_text: str) -> dict | None:
         return None
 
 
-async def generate_strategy_compass_topics(count: int = 8) -> list[dict[str, str]]:
+async def generate_strategy_compass_topics(count: int = 8) -> list[dict[str, object]]:
     """
     Generate random AI-in-BFSI strategy topics for the spin wheel.
 
@@ -111,10 +111,21 @@ async def generate_strategy_compass_topics(count: int = 8) -> list[dict[str, str
         "Mandatory coverage: Algorithmic Trading, KYC Automation, Debt Collection AI, "
         "Synthetic Data for Privacy, ESG Scoring, and Claims Processing.\n"
         "Output STRICT JSON only with this shape:\n"
-        '{ "topics": [ { "title": "string", "explanation": "one sentence" } ] }\n'
+        '{ "topics": [ { '
+        '"title": "string", '
+        '"explanation": "one sentence", '
+        '"how_it_works": "2 concise sentences", '
+        '"business_impact": "2 concise sentences", '
+        '"implementation_steps": ["step 1", "step 2", "step 3"], '
+        '"kpis": ["kpi 1", "kpi 2", "kpi 3"]'
+        " } ] }\n"
         "Rules:\n"
         "- title: concise, 3-8 words\n"
         "- explanation: exactly one sentence, 14-28 words, practical business impact\n"
+        "- how_it_works: exactly 2 sentences, practical, no jargon overload\n"
+        "- business_impact: exactly 2 sentences, include measurable outcomes\n"
+        "- implementation_steps: exactly 3 short imperative steps\n"
+        "- kpis: exactly 3 concise KPI names\n"
         "- no markdown, no numbering, no extra keys\n"
         f"- randomization seed: {time.time_ns()}"
     )
@@ -163,17 +174,46 @@ async def generate_strategy_compass_topics(count: int = 8) -> list[dict[str, str
     if not isinstance(topics, list):
         return []
 
-    cleaned: list[dict[str, str]] = []
+    cleaned: list[dict[str, object]] = []
     seen_titles: set[str] = set()
     for item in topics:
         if not isinstance(item, dict):
             continue
         title = str(item.get("title", "")).strip()
         explanation = str(item.get("explanation", "")).strip()
+        how_it_works = str(item.get("how_it_works", "")).strip()
+        business_impact = str(item.get("business_impact", "")).strip()
+        implementation_steps = [
+            str(step).strip()
+            for step in item.get("implementation_steps", [])
+            if str(step).strip()
+        ]
+        kpis = [
+            str(kpi).strip()
+            for kpi in item.get("kpis", [])
+            if str(kpi).strip()
+        ]
         normalized = title.casefold()
-        if not title or not explanation or normalized in seen_titles:
+        if (
+            not title
+            or not explanation
+            or not how_it_works
+            or not business_impact
+            or len(implementation_steps) < 3
+            or len(kpis) < 3
+            or normalized in seen_titles
+        ):
             continue
         seen_titles.add(normalized)
-        cleaned.append({"title": title, "explanation": explanation})
+        cleaned.append(
+            {
+                "title": title,
+                "explanation": explanation,
+                "how_it_works": how_it_works,
+                "business_impact": business_impact,
+                "implementation_steps": implementation_steps[:5],
+                "kpis": kpis[:5],
+            }
+        )
 
     return cleaned

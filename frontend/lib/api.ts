@@ -163,6 +163,10 @@ export type EventLobby = {
 export type StrategyCompassTopic = {
   title: string;
   explanation: string;
+  how_it_works?: string;
+  business_impact?: string;
+  implementation_steps?: string[];
+  kpis?: string[];
 };
 
 export type StrategyCompassTopicsResponse = {

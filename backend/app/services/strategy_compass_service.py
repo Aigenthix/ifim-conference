@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import random
 import uuid
+from typing import Any
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -13,7 +14,7 @@ from app.core.exceptions import ForbiddenError, NotFoundError
 from app.repositories.event_repo import EventRepository
 from app.schemas.event import StrategyCompassTopic, StrategyCompassTopicsResponse
 
-FALLBACK_TOPICS: list[dict[str, str]] = [
+FALLBACK_TOPICS: list[dict[str, object]] = [
     {
         "title": "Algorithmic Trading Co-Pilots",
         "explanation": "AI detects micro-patterns in market data and supports disciplined, faster execution decisions for trading teams.",
@@ -97,6 +98,78 @@ FALLBACK_TOPICS: list[dict[str, str]] = [
 ]
 
 
+def _default_how_it_works(title: str, explanation: str) -> str:
+    return (
+        f"{explanation} The model combines transaction history, customer behavior, and operational signals to score risk and recommend actions "
+        "with human oversight for critical decisions."
+    )
+
+
+def _default_business_impact(title: str) -> str:
+    return (
+        f"{title} typically improves cycle times and decision consistency while reducing manual effort. Teams can scale operations faster, "
+        "control risk exposure better, and improve customer experience with measurable outcomes."
+    )
+
+
+def _default_implementation_steps(title: str) -> list[str]:
+    lowered = title.lower()
+    return [
+        f"Define the {lowered} use case, baseline metrics, and governance owners.",
+        "Prepare high-quality historical data and validate model assumptions with domain experts.",
+        "Run a phased pilot with human-in-the-loop approvals before full production rollout.",
+    ]
+
+
+def _default_kpis() -> list[str]:
+    return [
+        "Turnaround time reduction (%)",
+        "Accuracy or error-rate improvement (%)",
+        "Cost-to-serve per case",
+    ]
+
+
+def _normalize_string_list(raw: Any, fallback: list[str]) -> list[str]:
+    if not isinstance(raw, list):
+        return fallback
+
+    cleaned: list[str] = []
+    for item in raw:
+        value = str(item).strip()
+        if value and value not in cleaned:
+            cleaned.append(value)
+
+    return cleaned[:5] if len(cleaned) >= 3 else fallback
+
+
+def _coerce_topic(item: dict[str, object]) -> dict[str, object] | None:
+    title = str(item.get("title", "")).strip()
+    explanation = str(item.get("explanation", "")).strip()
+    if not title or not explanation:
+        return None
+
+    how_it_works = str(item.get("how_it_works", "")).strip() or _default_how_it_works(
+        title, explanation
+    )
+    business_impact = str(item.get("business_impact", "")).strip() or _default_business_impact(
+        title
+    )
+    implementation_steps = _normalize_string_list(
+        item.get("implementation_steps"),
+        _default_implementation_steps(title),
+    )
+    kpis = _normalize_string_list(item.get("kpis"), _default_kpis())
+
+    return {
+        "title": title,
+        "explanation": explanation,
+        "how_it_works": how_it_works,
+        "business_impact": business_impact,
+        "implementation_steps": implementation_steps,
+        "kpis": kpis,
+    }
+
+
 class StrategyCompassService:
     """Generates strategy compass wheel topics and enforces event scope."""
 
@@ -124,21 +197,26 @@ class StrategyCompassService:
             topics=[StrategyCompassTopic(**item) for item in normalized]
         )
 
-    def _normalize_topics(self, generated: list[dict[str, str]], count: int) -> list[dict[str, str]]:
+    def _normalize_topics(
+        self,
+        generated: list[dict[str, object]],
+        count: int,
+    ) -> list[dict[str, object]]:
         """
         Enforce uniqueness and fill short outputs with randomized fallback topics.
         """
-        picked: list[dict[str, str]] = []
+        picked: list[dict[str, object]] = []
         seen: set[str] = set()
 
         for item in generated:
-            title = str(item.get("title", "")).strip()
-            explanation = str(item.get("explanation", "")).strip()
-            key = title.casefold()
-            if not title or not explanation or key in seen:
+            topic = _coerce_topic(item)
+            if not topic:
+                continue
+            key = str(topic["title"]).casefold()
+            if key in seen:
                 continue
             seen.add(key)
-            picked.append({"title": title, "explanation": explanation})
+            picked.append(topic)
             if len(picked) >= count:
                 break
 
@@ -146,11 +224,14 @@ class StrategyCompassService:
             fallback = FALLBACK_TOPICS.copy()
             random.shuffle(fallback)
             for item in fallback:
-                key = item["title"].casefold()
+                topic = _coerce_topic(item)
+                if not topic:
+                    continue
+                key = str(topic["title"]).casefold()
                 if key in seen:
                     continue
                 seen.add(key)
-                picked.append(item)
+                picked.append(topic)
                 if len(picked) >= count:
                     break
 
