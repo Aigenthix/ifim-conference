@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import uuid
 
-from sqlalchemy import ForeignKey, Index, UniqueConstraint
+from sqlalchemy import Boolean, ForeignKey, Index, UniqueConstraint
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -19,6 +19,7 @@ class Registration(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     event_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), ForeignKey("events.id", ondelete="CASCADE"), nullable=False
     )
+    goodies_given: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False, server_default="false")
 
     # Relationships
     user = relationship("User", back_populates="registrations", lazy="joined")

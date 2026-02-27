@@ -2,3 +2,8 @@
 .env
 avinash-aws.pem
 .pem
+*.csv
+*.xlsx
+old cetrificates/
+.DS_Store
+sql_patch.py

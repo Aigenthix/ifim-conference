@@ -2,8 +2,8 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
-import { Award, Download, Loader2, Clock } from "lucide-react";
-import { certificatesApi } from "@/lib/api";
+import { Award, Download, Loader2, Clock, MessageSquare } from "lucide-react";
+import { certificatesApi, feedbackApi } from "@/lib/api";
 import { useAuthStore } from "@/store/auth";
 import { useState } from "react";
 
@@ -11,11 +11,22 @@ export default function CertificateSection({ eventId }: { eventId: string }) {
   const token = useAuthStore((s) => s.token) ?? "";
   const [downloading, setDownloading] = useState(false);
 
+  // Check if feedback has been submitted
+  const { data: feedbackStatus, isLoading: checkingFeedback } = useQuery({
+    queryKey: ["feedback-check", eventId],
+    queryFn: () => feedbackApi.check(eventId, token),
+    enabled: !!eventId && !!token,
+    staleTime: 10_000,
+  });
+
+  const hasFeedback = feedbackStatus?.submitted === true;
+
   const { data: cert, isLoading, refetch } = useQuery({
     queryKey: ["certificate", eventId],
     queryFn: () => certificatesApi.getMine(token),
     staleTime: 10_000,
     retry: false,
+    enabled: hasFeedback, // Only fetch certificate if feedback submitted
   });
 
   const handleDownload = async () => {
@@ -52,10 +63,31 @@ export default function CertificateSection({ eventId }: { eventId: string }) {
     }
   };
 
-  if (isLoading) {
+  if (checkingFeedback || isLoading) {
     return <div style={{ height: "200px", borderRadius: "20px", background: "#eee", maxWidth: "480px", margin: "0 auto", animation: "shimmer 1.5s infinite" }}>
       <style>{`@keyframes shimmer { 0% { opacity: 0.6; } 50% { opacity: 1; } 100% { opacity: 0.6; } }`}</style>
     </div>;
+  }
+
+  // Gate: Feedback not submitted yet
+  if (!hasFeedback) {
+    return (
+      <div style={{ maxWidth: "480px", margin: "0 auto" }}>
+        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
+          style={{ borderRadius: "20px", background: "#fff", border: "1px solid #eee", padding: "60px 24px", textAlign: "center", boxShadow: "0 2px 12px rgba(0,0,0,0.04)" }}>
+          <div style={{ width: "64px", height: "64px", margin: "0 auto 20px", borderRadius: "50%", background: "rgba(245,158,11,0.1)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <MessageSquare style={{ width: "32px", height: "32px", color: "#f59e0b" }} />
+          </div>
+          <h3 style={{ fontSize: "22px", fontWeight: 700, color: "#111", marginBottom: "8px" }}>Feedback Required</h3>
+          <p style={{ color: "#666", fontSize: "14px", lineHeight: 1.7, marginBottom: "24px" }}>
+            Please submit your feedback first to unlock<br />your participation certificate.
+          </p>
+          <p style={{ color: "#999", fontSize: "13px" }}>
+            Go to the <strong style={{ color: "#8B0000" }}>Feedback</strong> tab to share your experience.
+          </p>
+        </motion.div>
+      </div>
+    );
   }
 
   if (!cert) {

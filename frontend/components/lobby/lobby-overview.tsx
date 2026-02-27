@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
-import { Calendar, Clock, MapPin, Shirt, Phone, Globe, Mic, Users, ChevronDown } from "lucide-react";
+import { Calendar, Clock, MapPin, Shirt, Phone, Globe, Mic, Users, ChevronDown, Sparkles, QrCode, X } from "lucide-react";
 import type { EventLobby } from "@/lib/api";
-
+import { useAuthStore } from "@/store/auth";
 type Speaker = { name: string; title?: string; bio?: string; image?: string };
 type TeamMember = { name: string; role?: string };
 type ScheduleItem = { time: string; title: string; day: string };
@@ -18,7 +18,35 @@ const SPEAKER_IMAGES: Record<string, string> = {
   "Rahul Agarwal": "/speakers/rahul-agarwal.png",
 };
 
+const SPEAKER_BIOS: Record<string, string> = {
+  "Siddharth Karnawat": "Mr. Siddharth Karnawat is a seasoned financial professional and entrepreneur with over 15 years of experience in the financial services industry. He holds a Bachelor’s degree in Commerce from the prestigious H.R. College of Commerce & Economics, Mumbai. As the Co-Founder of Blue Sky Fintech, he has been instrumental in building the firm with a vision to provide transparent, independent, and goal-based wealth management solutions focused on long-term value creation.\n\nSiddharth brings deep expertise in wealth management, investment strategy, and family office governance. His client-centric philosophy emphasizes disciplined capital allocation, prudent risk management, and sustainable wealth creation, helping families balance wealth preservation with long-term growth.\n\nA committed philanthropist, Mr. Karnawat is a Fellow Chartered Member (FCP) of JITO (Jain International Trade Organization), an active member of the prestigious Mumbai Cricket Association Club, BKC Mumbai, and a Donor Member of RVG Hostel, Mumbai. He is deeply involved in community development initiatives and strongly believes in using wealth as a catalyst for social progress and societal well-being.\n\nMr. Karnawat is also the host of “Blue Sky Talks,” a thought-leadership podcast platform where he engages with prominent personalities from finance, business, and sports. He has recently hosted insightful conversations with renowned market expert Mr. Anil Singhvi (Zee Business) and Indian international cricketer Mr. Deepak Chahar (India - Mumbai Indians).\n\nKnown for his strategic foresight, calm decision-making, and client-first approach, Siddharth Karnawat continues to contribute to industry thought leadership in areas such as wealth structuring, generational wealth transfer, and global investment trends. Through his dual roles as an entrepreneur, investor, and philanthropist, he exemplifies the modern wealth visionary — disciplined, forward-thinking, and committed to building enduring financial legacies.",
+  "Jatin Popat": "Mr. Jatin Popat is a qualified Lawyer & Company Secretary and has an experience of more than 30 years in Legal matters in India. He is the founder of WillJini, India’s first and most Trusted Succession services company.\n\nBefore founding WillJini, Mr. Jatin has headed Legal & Compliances in Gulf Oil, a listed Hinduja Group company.\n\nMr. Jatin has conducted 1,000+ awareness sessions across India - with a vision of “Harr Gharr ek Will” - to make wealth transfer a simple process which currently is full of legal hassles, confusion and misinformation.\n\nToday, WillJini is India’s No. 1 company in Succession Matters and has helped more than 20,000 families with Wills and Inheritance across 480 cities and 32 countries.",
+  "Hitesh Mali": "Mr. Hitesh Mali is the Founder of Equitywala.com, a leading financial services platform. He brings extensive experience in the financial markets and is known for his expertise in equity research, investment advisory, and wealth management solutions.",
+  "Nikhil Naik": "Mr. Nikhil Naik is the Founder of AD Naik Wealth, a wealth management firm dedicated to helping individuals and families achieve their financial goals through strategic investment planning and portfolio management.",
+  "Rahul Agarwal": "Mr. Rahul Agarwal is the Founder of Ideal Insurance Brokers, a company specializing in providing comprehensive insurance solutions. With deep industry knowledge, he helps clients navigate complex insurance requirements with tailored advisory services.",
+};
+
 export default function LobbyOverview({ lobby }: { lobby: EventLobby }) {
+  const { userId, eventId, userName, userEmail, userPhone, userCompany, userFoodPreference, userTshirtSize, userGrowthFocus } = useAuthStore();
+
+  // Generate QR code URL encoding user profile as vCard
+  const qrCodeUrl = useMemo(() => {
+    if (!userName) return null;
+    const vCard = [
+      "BEGIN:VCARD",
+      "VERSION:3.0",
+      `FN:${userName}`,
+      userEmail ? `EMAIL:${userEmail}` : "",
+      userPhone ? `TEL:${userPhone}` : "",
+      userCompany ? `ORG:${userCompany}` : "",
+      userId ? `X-USER-ID:${userId}` : "",
+      eventId ? `X-EVENT-ID:${eventId}` : "",
+      userFoodPreference ? `NOTE:Food: ${userFoodPreference}; T-Shirt: ${userTshirtSize || "N/A"}; Growth Focus: ${userGrowthFocus || "N/A"}` : "",
+      "END:VCARD",
+    ].filter(Boolean).join("\n");
+    return `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(vCard)}`;
+  }, [eventId, userId, userName, userEmail, userPhone, userCompany, userFoodPreference, userTshirtSize, userGrowthFocus]);
+  const [showQr, setShowQr] = useState(false);
   const speakers = lobby.speakers as Speaker[] | null;
   const team = lobby.team as TeamMember[] | null;
   const overview = lobby.overview as Overview | null;
@@ -35,6 +63,109 @@ export default function LobbyOverview({ lobby }: { lobby: EventLobby }) {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "28px" }}>
+      {/* Welcome Banner */}
+      {userName && (
+        <motion.div variants={fadeUp} initial="hidden" animate="show" style={{
+          borderRadius: "16px",
+          background: "#ffffff",
+          padding: "24px 28px",
+          boxShadow: "0 4px 20px rgba(139,0,0,0.08)",
+          border: "1px solid #fee2e2",
+        }}>
+          <div style={{ display: "flex", alignItems: "flex-start", gap: "14px" }}>
+            <div style={{
+              width: "40px", height: "40px", borderRadius: "12px",
+              background: "linear-gradient(135deg, #8B0000, #DC143C)",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              flexShrink: 0,
+            }}>
+              <Sparkles style={{ width: "20px", height: "20px", color: "#fff" }} />
+            </div>
+            <div>
+              <h2 style={{
+                fontSize: "18px", fontWeight: 800, color: "#8B0000",
+                margin: 0, lineHeight: 1.3,
+              }}>
+                {userName}, Welcome to Raj Darbar 2026
+              </h2>
+              <p style={{
+                fontSize: "13px", color: "#DC143C", margin: "6px 0 0",
+                lineHeight: 1.5, opacity: 0.85,
+              }}>
+                An exclusive platform for market leaders and bold entrepreneurs.
+              </p>
+            </div>
+          </div>
+        </motion.div>
+      )}
+
+      {/* QR Code Profile Card */}
+      {userName && qrCodeUrl && (
+        <motion.div variants={fadeUp} initial="hidden" animate="show" style={{
+          borderRadius: "16px", background: "#fff", padding: "24px",
+          boxShadow: "0 4px 20px rgba(0,0,0,0.08)", border: "1px solid #f0f0f0",
+        }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+              <div style={{
+                width: "32px", height: "32px", borderRadius: "8px",
+                background: "linear-gradient(135deg, #8B0000, #DC143C)",
+                display: "flex", alignItems: "center", justifyContent: "center",
+              }}>
+                <QrCode style={{ width: "16px", height: "16px", color: "#fff" }} />
+              </div>
+              <h3 style={{ fontSize: "16px", fontWeight: 700, color: "#1a1a1a", margin: 0 }}>Your Event Badge</h3>
+            </div>
+            <button
+              onClick={() => setShowQr(!showQr)}
+              style={{
+                padding: "8px 18px", borderRadius: "10px", border: "none",
+                background: showQr ? "#f0f0f0" : "linear-gradient(135deg, #8B0000, #DC143C)",
+                color: showQr ? "#666" : "#fff",
+                fontSize: "13px", fontWeight: 600, cursor: "pointer",
+                transition: "all 0.2s",
+              }}
+            >
+              {showQr ? "Hide QR" : "Generate QR"}
+            </button>
+          </div>
+
+          {showQr && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              transition={{ duration: 0.3 }}
+              style={{ marginTop: "20px" }}
+            >
+              <div style={{ display: "flex", gap: "24px", flexWrap: "wrap", alignItems: "flex-start", justifyContent: "center" }}>
+                {/* QR Code */}
+                <div style={{
+                  padding: "12px", borderRadius: "12px", background: "#f9f9f9",
+                  border: "1px solid #eee", flexShrink: 0, margin: "0 auto",
+                }}>
+                  <img src={qrCodeUrl} alt="Profile QR Code" width={160} height={160}
+                    style={{ display: "block", borderRadius: "8px" }} />
+                  <p style={{ fontSize: "10px", color: "#999", textAlign: "center", margin: "8px 0 0" }}>
+                    Scan to view profile
+                  </p>
+                </div>
+
+                {/* Profile Details */}
+                <div style={{ flex: 1, minWidth: "200px", display: "flex", flexDirection: "column", gap: "12px" }}>
+                  <ProfileRow icon="👤" label="Name" value={userName} />
+                  {userCompany && <ProfileRow icon="🏢" label="Company" value={userCompany} />}
+                  {userEmail && <ProfileRow icon="📧" label="Email" value={userEmail} />}
+                  {userPhone && <ProfileRow icon="📱" label="Phone" value={userPhone} />}
+                  {userFoodPreference && <ProfileRow icon="🍽️" label="Food" value={userFoodPreference} />}
+                  {userTshirtSize && <ProfileRow icon="👕" label="T-Shirt" value={userTshirtSize} />}
+                  {userGrowthFocus && <ProfileRow icon="🎯" label="Growth Focus" value={userGrowthFocus} />}
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </motion.div>
+      )}
+
       {/* Hero Card */}
       <motion.div variants={fadeUp} initial="hidden" animate="show" style={{
         borderRadius: "20px", background: "linear-gradient(135deg, #8B0000, #DC143C)",
@@ -102,38 +233,9 @@ export default function LobbyOverview({ lobby }: { lobby: EventLobby }) {
       {speakers && speakers.length > 0 && (
         <Section title="Speakers" icon={Mic} delay={0.15}>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: "16px" }}>
-            {speakers.map((s, i) => {
-              const imgSrc = SPEAKER_IMAGES[s.name];
-              return (
-                <div key={i} style={{
-                  borderRadius: "16px", padding: "24px", background: "#fafafa",
-                  border: "1px solid #f0f0f0",
-                }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: "14px", marginBottom: "12px" }}>
-                    {imgSrc ? (
-                      <img src={imgSrc} alt={s.name} style={{
-                        width: "56px", height: "56px", borderRadius: "50%",
-                        objectFit: "cover", border: "3px solid #DC143C",
-                      }} />
-                    ) : (
-                      <div style={{
-                        width: "56px", height: "56px", borderRadius: "50%",
-                        background: "linear-gradient(135deg, #8B0000, #DC143C)",
-                        display: "flex", alignItems: "center", justifyContent: "center",
-                        color: "#fff", fontWeight: 700, fontSize: "20px",
-                      }}>
-                        {s.name.charAt(0)}
-                      </div>
-                    )}
-                    <div>
-                      <h3 style={{ fontWeight: 600, fontSize: "15px", color: "#111" }}>{s.name}</h3>
-                      {s.title && <p style={{ fontSize: "12px", color: "#8B0000", fontWeight: 500 }}>{s.title}</p>}
-                    </div>
-                  </div>
-                  {s.bio && <p style={{ fontSize: "13px", color: "#666", lineHeight: 1.7 }}>{s.bio}</p>}
-                </div>
-              );
-            })}
+            {speakers.map((s, i) => (
+              <SpeakerCard key={i} speaker={s} />
+            ))}
           </div>
         </Section>
       )}
@@ -152,8 +254,20 @@ export default function LobbyOverview({ lobby }: { lobby: EventLobby }) {
                   background: "linear-gradient(135deg, #DC143C, #FF6B6B)",
                   display: "flex", alignItems: "center", justifyContent: "center",
                   color: "#fff", fontWeight: 700, fontSize: "16px",
+                  overflow: "hidden"
                 }}>
-                  {t.name.charAt(0)}
+                  <img
+                    src={`/team/${encodeURIComponent(t.name.toUpperCase())}.png`}
+                    alt={t.name}
+                    style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                    onError={(e) => {
+                      e.currentTarget.style.display = "none";
+                      if (e.currentTarget.nextSibling) {
+                        (e.currentTarget.nextSibling as HTMLSpanElement).style.display = "inline";
+                      }
+                    }}
+                  />
+                  <span style={{ display: "none" }}>{t.name.charAt(0)}</span>
                 </div>
                 <p style={{ fontWeight: 600, fontSize: "14px", color: "#111" }}>{t.name}</p>
                 {t.role && <p style={{ fontSize: "12px", color: "#888", marginTop: "4px" }}>{t.role}</p>}
@@ -163,6 +277,217 @@ export default function LobbyOverview({ lobby }: { lobby: EventLobby }) {
         </Section>
       )}
     </div>
+  );
+}
+
+/* ── Speaker Card with Modal Bio ── */
+function SpeakerCard({ speaker }: { speaker: Speaker }) {
+  const [openBio, setOpenBio] = useState(false);
+  const imgSrc = SPEAKER_IMAGES[speaker.name];
+  const speakerBio = speaker.bio || SPEAKER_BIOS[speaker.name] || "";
+  const bioParagraphs = useMemo(
+    () =>
+      speakerBio
+        .split(/\n{2,}/)
+        .map((part) => part.trim())
+        .filter(Boolean),
+    [speakerBio]
+  );
+  const previewText = useMemo(() => {
+    const firstParagraph = bioParagraphs[0] || "";
+    if (!firstParagraph) return "Speaker details coming soon.";
+    return firstParagraph.length > 160 ? `${firstParagraph.slice(0, 160)}...` : firstParagraph;
+  }, [bioParagraphs]);
+  const hasBio = bioParagraphs.length > 0;
+
+  return (
+    <>
+      <div
+        style={{
+          borderRadius: "16px",
+          padding: "18px",
+          background: "#fafafa",
+          border: "1px solid #f0f0f0",
+          display: "flex",
+          flexDirection: "column",
+          gap: "14px",
+          minHeight: "214px",
+          transition: "all 0.2s",
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "flex-start", gap: "12px" }}>
+          {imgSrc ? (
+            <img src={imgSrc} alt={speaker.name} style={{
+              width: "56px", height: "56px", borderRadius: "50%",
+              objectFit: "cover", border: "3px solid #DC143C", flexShrink: 0,
+            }} />
+          ) : (
+            <div style={{
+              width: "56px", height: "56px", borderRadius: "50%",
+              background: "linear-gradient(135deg, #8B0000, #DC143C)",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              color: "#fff", fontWeight: 700, fontSize: "20px", flexShrink: 0,
+            }}>
+              {speaker.name.charAt(0)}
+            </div>
+          )}
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <h3 style={{ fontWeight: 700, fontSize: "22px", color: "#111", lineHeight: 1.2, margin: 0 }}>
+              {speaker.name}
+            </h3>
+            {speaker.title && (
+              <p style={{ fontSize: "13px", color: "#8B0000", fontWeight: 600, marginTop: "5px", marginBottom: 0 }}>
+                {speaker.title}
+              </p>
+            )}
+          </div>
+        </div>
+        <p
+          style={{
+            fontSize: "13px",
+            color: "#5a5a5a",
+            lineHeight: 1.65,
+            margin: 0,
+            display: "-webkit-box",
+            WebkitLineClamp: 4,
+            WebkitBoxOrient: "vertical",
+            overflow: "hidden",
+            minHeight: "84px",
+          }}
+        >
+          {previewText}
+        </p>
+        <button
+          type="button"
+          onClick={() => {
+            if (!hasBio) return;
+            setOpenBio(true);
+          }}
+          disabled={!hasBio}
+          style={{
+            marginTop: "auto",
+            border: "none",
+            borderRadius: "10px",
+            padding: "10px 12px",
+            background: hasBio ? "linear-gradient(135deg, #8B0000, #DC143C)" : "#ededed",
+            color: hasBio ? "#fff" : "#8f8f8f",
+            fontSize: "12px",
+            fontWeight: 700,
+            cursor: hasBio ? "pointer" : "not-allowed",
+            display: "inline-flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: "8px",
+            width: "100%",
+          }}
+        >
+          {hasBio ? "Tap to read full profile" : "Profile coming soon"}
+          <ChevronDown style={{ width: "14px", height: "14px" }} />
+        </button>
+      </div>
+
+      {openBio && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          onClick={() => setOpenBio(false)}
+          style={{
+            position: "fixed",
+            inset: 0,
+            zIndex: 70,
+            background: "rgba(0,0,0,0.5)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "12px",
+          }}
+        >
+          <motion.div
+            initial={{ opacity: 0, y: 14, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ duration: 0.2 }}
+            onClick={(event) => event.stopPropagation()}
+            style={{
+              width: "min(760px, calc(100vw - 24px))",
+              maxHeight: "85vh",
+              overflow: "hidden",
+              borderRadius: "18px",
+              background: "#fff",
+              border: "1px solid #ececec",
+              boxShadow: "0 20px 50px rgba(0,0,0,0.25)",
+              display: "flex",
+              flexDirection: "column",
+            }}
+          >
+            <div
+              style={{
+                padding: "16px 18px",
+                borderBottom: "1px solid #f0f0f0",
+                display: "flex",
+                alignItems: "flex-start",
+                justifyContent: "space-between",
+                gap: "12px",
+              }}
+            >
+              <div style={{ minWidth: 0 }}>
+                <h3 style={{ margin: 0, fontSize: "20px", lineHeight: 1.2, color: "#121212", fontWeight: 800 }}>
+                  {speaker.name}
+                </h3>
+                {speaker.title && (
+                  <p style={{ margin: "5px 0 0", fontSize: "13px", color: "#8B0000", fontWeight: 600 }}>
+                    {speaker.title}
+                  </p>
+                )}
+              </div>
+              <button
+                type="button"
+                onClick={() => setOpenBio(false)}
+                style={{
+                  width: "34px",
+                  height: "34px",
+                  borderRadius: "10px",
+                  border: "1px solid #ececec",
+                  background: "#fff",
+                  color: "#666",
+                  cursor: "pointer",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  flexShrink: 0,
+                }}
+                aria-label="Close speaker bio"
+              >
+                <X style={{ width: "16px", height: "16px" }} />
+              </button>
+            </div>
+
+            <div
+              style={{
+                padding: "18px",
+                overflowY: "auto",
+                maxHeight: "calc(85vh - 90px)",
+              }}
+            >
+              {bioParagraphs.map((paragraph, index) => (
+                <p
+                  key={`${speaker.name}-bio-${index}`}
+                  style={{
+                    fontSize: "14px",
+                    color: "#444",
+                    lineHeight: 1.8,
+                    marginTop: 0,
+                    marginBottom: index === bioParagraphs.length - 1 ? 0 : "16px",
+                  }}
+                >
+                  {paragraph}
+                </p>
+              ))}
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </>
   );
 }
 
@@ -243,5 +568,17 @@ function Section({ title, icon: Icon, delay, children }: { title: string; icon: 
       </div>
       {children}
     </motion.div>
+  );
+}
+
+function ProfileRow({ icon, label, value }: { icon: string; label: string; value: string }) {
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+      <span style={{ fontSize: "16px", width: "24px", textAlign: "center" }}>{icon}</span>
+      <div>
+        <span style={{ fontSize: "11px", color: "#999", fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.5px" }}>{label}</span>
+        <p style={{ fontSize: "14px", color: "#333", fontWeight: 500, margin: 0 }}>{value}</p>
+      </div>
+    </div>
   );
 }

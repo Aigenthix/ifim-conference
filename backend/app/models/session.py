@@ -23,6 +23,7 @@ class Session(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     display_order: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
     audio_url: Mapped[str | None] = mapped_column(Text, nullable=True)
     video_url: Mapped[str | None] = mapped_column(Text, nullable=True)
+    description: Mapped[str | None] = mapped_column(Text, nullable=True)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
 
     # Relationships

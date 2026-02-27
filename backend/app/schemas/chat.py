@@ -9,6 +9,7 @@ from pydantic import BaseModel, Field
 class ChatQueryRequest(BaseModel):
     event_id: uuid.UUID
     query: str = Field(..., min_length=1, max_length=1000)
+    history: list[dict[str, str]] | None = None
 
 
 class ChatQueryResponse(BaseModel):

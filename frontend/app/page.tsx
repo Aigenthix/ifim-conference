@@ -70,6 +70,17 @@ export default function HomePage() {
             <path d="M7.5 15L12.5 10L7.5 5" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         </Link>
+
+        {/* Golden Core Values */}
+        <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "16px", fontSize: "14px", fontWeight: 800, color: "#FFD700", letterSpacing: "0.5px", marginTop: "42px", textAlign: "center" as const, textShadow: "0 2px 10px rgba(0,0,0,0.2)" }}>
+          <span style={{ whiteSpace: "nowrap" }}>Growth Through Technology</span>
+          <span className="desktop-dot" style={{ display: "none" }}>•</span>
+          <span style={{ whiteSpace: "nowrap" }}>Growth Through Team</span>
+          <span className="desktop-dot" style={{ display: "none" }}>•</span>
+          <span style={{ whiteSpace: "nowrap" }}>Growth Through Communication</span>
+          <span className="desktop-dot" style={{ display: "none" }}>•</span>
+          <span style={{ whiteSpace: "nowrap" }}>Growth Through Networking</span>
+        </div>
       </div>
 
       {/* Footer */}
@@ -79,7 +90,7 @@ export default function HomePage() {
         <span style={{ whiteSpace: "nowrap" }}>9321064995</span>
         <span style={{ display: "none" }}>•</span>
         <span style={{ whiteSpace: "nowrap" }}>*Entry by Invitation Only</span>
-        <style>{`@media (min-width: 600px) { span[style*="display: none"] { display: inline !important; } }`}</style>
+        <style>{`@media (min-width: 600px) { span[style*="display: none"], .desktop-dot { display: inline !important; } }`}</style>
       </div>
     </main>
   );

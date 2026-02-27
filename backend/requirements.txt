@@ -6,6 +6,7 @@ python-multipart
 # Database
 sqlalchemy[asyncio]
 asyncpg
+psycopg2-binary
 alembic
 pgvector
 
@@ -29,6 +30,10 @@ httpx
 # Email
 aiosmtplib
 aiofiles
+
+# QR Code + Excel
+qrcode[pil]
+openpyxl
 
 # Utilities
 pydantic[email]

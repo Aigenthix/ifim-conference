@@ -49,13 +49,21 @@ async function request<T>(endpoint: string, options: RequestOptions = {}): Promi
     );
   }
 
+  if (res.status === 204) {
+    return null as T;
+  }
+
   return res.json();
 }
 
 // ── Auth ──────────────────────────────────────────────────
 export const authApi = {
-  register: (data: { name: string; email: string; phone: string; event_slug: string }) =>
-    request<{ user_id: string; event_id: string; access_token: string }>("/api/v1/auth/register", {
+  register: (data: { name: string; email?: string; phone?: string; event_slug: string }) =>
+    request<{
+      user_id: string; event_id: string; access_token: string;
+      user_name: string; user_email: string; user_phone: string;
+      user_company: string | null; user_food_preference: string | null; user_tshirt_size: string | null; user_growth_focus: string | null;
+    }>("/api/v1/auth/register", {
       method: "POST",
       body: data,
     }),
@@ -65,6 +73,8 @@ export const authApi = {
 export const eventsApi = {
   getLobby: (slug: string, token: string) =>
     request<EventLobby>(`/api/v1/events/${slug}/lobby`, { token }),
+  getDashboard: (slug: string, token: string) =>
+    request<Dashboard>(`/api/v1/events/${slug}/dashboard`, { token }),
   getStrategyCompassTopics: (slug: string, token: string, count = 8) =>
     request<StrategyCompassTopicsResponse>(`/api/v1/events/${slug}/strategy-compass-topics?count=${count}`, { token }),
 };
@@ -113,7 +123,7 @@ export const galleryApi = {
 
 // ── Chatbot ───────────────────────────────────────────────
 export const chatbotApi = {
-  query: (data: { event_id: string; query: string }, token: string) =>
+  query: (data: { event_id: string; query: string; history?: {role: string, content: string}[] }, token: string) =>
     request<ChatResponse>("/api/v1/chatbot/query", { method: "POST", body: data, token }),
 };
 
@@ -126,13 +136,34 @@ export const adminApi = {
       method: "POST",
       body: { email, password },
     }),
+  addUser: (eventId: string, data: { name: string; email: string; phone: string; company?: string; food_preference?: string; tshirt_size?: string; growth_focus?: string }, token: string) =>
+    request<{ user_id: string; message: string }>(`/api/v1/admin/users/${eventId}`, { method: "POST", body: data, token }),
+  getAttendance: (eventId: string, token: string) =>
+    request<AttendanceResponse>(`/api/v1/admin/attendance/${eventId}`, { token }),
+  scanAttendanceQr: (eventId: string, data: { qr_payload: string }, token: string) =>
+    request<ScanAttendanceResponse>(`/api/v1/admin/attendance/${eventId}/scan`, {
+      method: "POST",
+      body: data,
+      token,
+    }),
+  toggleGoodies: (eventId: string, data: { user_id: string; goodies_given: boolean }, token: string) =>
+    request<{ success: boolean; goodies_given: boolean }>(`/api/v1/admin/goodies/${eventId}`, { method: "POST", body: data, token }),
+  getFeedback: (eventId: string, token: string) =>
+    request<FeedbackListResponse>(`/api/v1/admin/feedback/${eventId}`, { token }),
+  // Food Attendance
+  getFoodAttendance: (eventId: string, token: string) =>
+    request<FoodAttendanceResponse>(`/api/v1/admin/food-attendance/${eventId}`, { token }),
+  scanFoodQr: (eventId: string, data: { qr_payload: string; slot?: string }, token: string) =>
+    request<FoodScanResponse>(`/api/v1/admin/food-attendance/${eventId}/scan`, { method: "POST", body: data, token }),
+  toggleFoodSlot: (eventId: string, data: { user_id: string; slot: string; value: boolean }, token: string) =>
+    request<{ success: boolean; attendee: FoodAttendanceItem }>(`/api/v1/admin/food-attendance/${eventId}/toggle`, { method: "POST", body: data, token }),
 };
 
 // ── Sessions ──────────────────────────────────────────────
 export const sessionsApi = {
   getEventSessions: (eventId: string, token: string) =>
     request<{ sessions: SessionItem[] }>(`/api/v1/sessions/event/${eventId}`, { token }),
-  create: (data: { event_id: string; title: string; speaker_name?: string; speaker_title?: string; day: number; display_order?: number; audio_url?: string; video_url?: string }, token: string) =>
+  create: (data: { event_id: string; title: string; speaker_name?: string; speaker_title?: string; description?: string; day: number; display_order?: number; audio_url?: string; video_url?: string }, token: string) =>
     request<SessionItem>("/api/v1/sessions/", { method: "POST", body: data, token }),
   delete: (sessionId: string, token: string) =>
     request<void>(`/api/v1/sessions/${sessionId}`, { method: "DELETE", token }),
@@ -144,9 +175,56 @@ export const alertsApi = {
     request<{ alerts: AlertItem[] }>(`/api/v1/alerts/event/${eventId}`, { token }),
   create: (data: { event_id: string; title: string; message: string; is_pinned?: boolean }, token: string) =>
     request<AlertItem>("/api/v1/alerts/", { method: "POST", body: data, token }),
+  getAutoAlertStatus: (eventId: string, token: string) =>
+    request<{ enabled: boolean }>(`/api/v1/alerts/auto/${eventId}`, { token }),
+  toggleAutoAlerts: (eventId: string, enabled: boolean, token: string) =>
+    request<{ enabled: boolean }>(`/api/v1/alerts/auto/${eventId}`, { method: "POST", body: { enabled }, token }),
 };
 
-// ── Types ─────────────────────────────────────────────────
+// ── Q&A ──────────────────────────────────────────────────
+export const qaApi = {
+  getSessions: (eventId: string, token: string) =>
+    request<{ sessions: QASessionItem[] }>(`/api/v1/qa/${eventId}/sessions`, { token }),
+  getQuestions: (
+    eventId: string,
+    token: string,
+    options?: { after?: string; limit?: number }
+  ) => {
+    const params = new URLSearchParams();
+    if (options?.after) params.set("after", options.after);
+    if (typeof options?.limit === "number") params.set("limit", String(options.limit));
+    const suffix = params.toString() ? `?${params.toString()}` : "";
+    return request<{ questions: QAQuestionItem[] }>(`/api/v1/qa/${eventId}${suffix}`, { token });
+  },
+  ask: (data: { event_id: string; session_id: string; question: string }, token: string) =>
+    request<QAQuestionItem>("/api/v1/qa/ask", { method: "POST", body: data, token }),
+};
+
+// ── Community Chat ───────────────────────────────────────
+export const communityApi = {
+  getMessages: (
+    eventId: string,
+    token: string,
+    options?: { after?: string; limit?: number }
+  ) => {
+    const params = new URLSearchParams();
+    if (options?.after) params.set("after", options.after);
+    if (typeof options?.limit === "number") params.set("limit", String(options.limit));
+    const suffix = params.toString() ? `?${params.toString()}` : "";
+    return request<{ messages: CommunityMessageItem[] }>(`/api/v1/community/${eventId}${suffix}`, { token });
+  },
+  send: (
+    data: { 
+      event_id: string; 
+      message: string;
+      reply_to_id?: string;
+      reply_to_user_name?: string;
+      reply_to_message?: string;
+    }, 
+    token: string
+  ) =>
+    request<CommunityMessageItem>("/api/v1/community/send", { method: "POST", body: data, token }),
+};
 export type EventLobby = {
   id: string;
   title: string;
@@ -244,6 +322,7 @@ export type SessionItem = {
   display_order: number;
   audio_url: string | null;
   video_url: string | null;
+  description: string | null;
   is_active: boolean;
   created_at: string;
 };
@@ -255,6 +334,148 @@ export type AlertItem = {
   message: string;
   is_pinned: boolean;
   created_at: string;
+};
+
+export type AttendeeItem = {
+  user_id: string;
+  name: string;
+  email: string;
+  phone: string;
+  company: string | null;
+  food_preference: string | null;
+  tshirt_size: string | null;
+  growth_focus: string | null;
+  goodies_given: boolean;
+  registered_at: string;
+};
+
+export type AttendanceResponse = {
+  total: number;
+  attendees: AttendeeItem[];
+};
+
+export type ScanAttendanceResponse = {
+  success: boolean;
+  message: string;
+  attendee: AttendeeItem;
+  goodies_given: boolean;
+};
+
+export type FoodAttendanceItem = {
+  user_id: string;
+  name: string;
+  email: string;
+  phone: string;
+  company: string | null;
+  food_preference: string | null;
+  growth_focus: string | null;
+  dinner1: boolean;
+  breakfast: boolean;
+  tea1: boolean;
+  tea2: boolean;
+  lunch: boolean;
+  tea3: boolean;
+  dinner2: boolean;
+  tea4: boolean;
+  total_meals: number;
+};
+
+export type FoodAttendanceResponse = {
+  total: number;
+  total_meals_served: number;
+  attendees: FoodAttendanceItem[];
+};
+
+export type FoodScanResponse = {
+  success: boolean;
+  message: string;
+  attendee: FoodAttendanceItem;
+  slot_filled: string;
+};
+
+export type FeedbackItemDetail = {
+  user_name: string;
+  user_email: string;
+  rating: number;
+  comments: string | null;
+  submitted_at: string;
+};
+
+export type FeedbackListResponse = {
+  total: number;
+  average_rating: number;
+  feedback: FeedbackItemDetail[];
+};
+
+export type QAQuestionItem = {
+  id: string;
+  session_id: string;
+  user_name: string;
+  question: string;
+  answer: string | null;
+  created_at: string;
+};
+
+export type QASessionItem = {
+  id: string;
+  title: string;
+  speaker_name: string | null;
+  day: string;
+  day_number: number;
+  time_range: string;
+  display_order: number;
+};
+
+export type CommunityMessageItem = {
+  id: string;
+  user_id: string;
+  user_name: string;
+  message: string;
+  created_at: string;
+  reply_to_id?: string | null;
+  reply_to_user_name?: string | null;
+  reply_to_message?: string | null;
+};
+
+export type TicketItem = {
+  id: string;
+  ticket_id: string;
+  name: string;
+  email: string;
+  phone: string;
+  company: string | null;
+  designation: string | null;
+  email_status: string;
+  scanned: boolean;
+  scanned_at: string | null;
+  created_at: string;
+};
+
+export const bulkEmailApi = {
+  upload: async (formData: FormData, token: string) => {
+    const res = await fetch(`${API_BASE}/api/v1/bulk-email/upload`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${token}` },
+      body: formData,
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ detail: "Upload failed" }));
+      throw new Error(err.detail || "Upload failed");
+    }
+    return res.json() as Promise<{ total: number; created: number; skipped: number; message: string }>;
+  },
+  getTickets: (eventId: string, token: string) =>
+    request<TicketItem[]>(`/api/v1/bulk-email/${eventId}/tickets`, { token }),
+  scan: (ticketId: string, token: string) =>
+    request<{ status: string; name?: string; ticket_id?: string; scanned_at?: string }>(
+      "/api/v1/bulk-email/scan",
+      { method: "POST", body: { ticket_id: ticketId }, token }
+    ),
+  retry: (body: { event_id: string; smtp_host: string; smtp_port: number; sender_email: string; sender_password: string; provider: string }, token: string) =>
+    request<{ pending_count: number; message: string }>(
+      "/api/v1/bulk-email/retry",
+      { method: "POST", body, token }
+    ),
 };
 
 export { ApiError };

@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import json
 import logging
+import re
 import time
 
 import httpx
@@ -17,7 +18,34 @@ from app.core.config import get_settings
 logger = logging.getLogger(__name__)
 
 
-async def generate_response(query: str, context: str) -> str:
+def _looks_structured(text: str) -> bool:
+    lines = [line.strip() for line in text.splitlines() if line.strip()]
+    if not lines:
+        return False
+    return any(line.startswith("- ") for line in lines)
+
+
+def _enforce_structured_answer(text: str) -> str:
+    cleaned = text.strip()
+    if not cleaned:
+        return cleaned
+    if len(cleaned) < 260 or _looks_structured(cleaned):
+        return cleaned
+
+    normalized = " ".join(cleaned.split())
+    sentences = [
+        sentence.strip()
+        for sentence in re.split(r"(?<=[.!?])\s+", normalized)
+        if sentence.strip()
+    ]
+    if len(sentences) < 2:
+        return cleaned
+
+    bullets = "\n".join(f"- {sentence}" for sentence in sentences[:6])
+    return f"Key Points:\n{bullets}"
+
+
+async def generate_response(query: str, context: str, history: list[dict[str, str]] | None = None) -> str:
     """
     Generate an LLM response given a user query and retrieved context.
 
@@ -26,14 +54,26 @@ async def generate_response(query: str, context: str) -> str:
     """
     settings = get_settings()
 
+    history_text = ""
+    if history:
+        # Keep only the last few messages for succinctness
+        recent_history = history[-6:]
+        history_text = "\n\nConversation History:\n" + "\n".join(
+            f"{msg.get('role', 'user').title()}: {msg.get('content', '')}" 
+            for msg in recent_history
+        )
+
     system_prompt = (
         "You are a helpful event assistant. Answer the user's question "
         "based ONLY on the provided context. If the context doesn't contain "
         "the answer, say so politely. Be concise and helpful.\n"
-        "IMPORTANT: Respond in plain text ONLY. Do NOT use any markdown formatting, "
-        "asterisks (*), bullet points, headers (#), or special characters. "
-        "Use simple sentences and line breaks for structure.\n\n"
-        f"Context:\n{context}"
+        "Response format rules:\n"
+        "- Use plain text only.\n"
+        "- For short answers (1-2 lines), respond directly.\n"
+        "- For detailed answers, use structured sections with line breaks and hyphen bullets.\n"
+        "- Keep each bullet specific, practical, and easy to scan.\n"
+        "- Avoid large unbroken paragraphs.\n\n"
+        f"Context:\n{context}{history_text}"
     )
 
     async with httpx.AsyncClient() as client:
@@ -63,7 +103,8 @@ async def generate_response(query: str, context: str) -> str:
         if candidates:
             parts = candidates[0].get("content", {}).get("parts", [])
             if parts:
-                return parts[0].get("text", "I couldn't generate a response.")
+                raw = parts[0].get("text", "I couldn't generate a response.")
+                return _enforce_structured_answer(raw)
 
         return "I couldn't generate a response. Please try again."
 

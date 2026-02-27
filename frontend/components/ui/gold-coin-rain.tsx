@@ -53,7 +53,7 @@ const CoinFace = ({ translateZ, rotateY = "0deg", isEdge = false, isBackFace = f
             top: '2%', // optical centering
             transform: isBackFace ? 'scaleX(-1)' : 'none',
             display: 'inline-block'
-          }}>$</span>
+          }}>₹</span>
         </div>
         
         {/* Diagonal Lighting Shine Overlay (Matches reference curve) */}

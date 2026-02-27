@@ -70,12 +70,30 @@ async def fill_data():
             
             # Frontend expects: [{name, role?}]
             event.team_json = json.dumps([
-                {"name": "Priya Sharma", "role": "Event Director"},
-                {"name": "James Wilson", "role": "Technical Coordinator"},
-                {"name": "Rahul Kapoor", "role": "Logistics Manager"},
-                {"name": "Sneha Nair", "role": "Marketing Lead"},
-                {"name": "Arjun Reddy", "role": "Sponsorship Head"},
-                {"name": "Meera Joshi", "role": "Volunteer Coordinator"}
+                {"name": "Hitesh Mali", "role": "Founder"},
+                {"name": "Krupa Mali", "role": "Director"},
+                {"name": "Chirag Vashi", "role": "Partner"},
+                {"name": "Parag Shah", "role": "Business Partner"},
+                {"name": "Anant Thakkar", "role": "Business Partner"},
+                {"name": "Bhargavi Patnaik", "role": "Senior Consultant"},
+                {"name": "Priyanka Patil", "role": "Business Development VP"},
+                {"name": "Mehul Prajapati", "role": "Branch Head"},
+                {"name": "Roshni Patel", "role": "Business Development Head"},
+                {"name": "Nimisha Ganatra", "role": "PMS Head"},
+                {"name": "Dhyan Patel", "role": "MTF Head"},
+                {"name": "Sayban Shaikh", "role": "Dealing Department Head"},
+                {"name": "Gautam Bhatia", "role": "Sales Executive"},
+                {"name": "Ankita Darji", "role": "Operation Executive"},
+                {"name": "Mazahir Petiwala", "role": "MF-Operation Executive"},
+                {"name": "Prachi Bhatt", "role": "MF-Operation Executive"},
+                {"name": "Sachin Somavanshi", "role": "Sales Executive"},
+                {"name": "Janvi Solanki", "role": "Accounts Executive"},
+                {"name": "Nirav Tailor", "role": "IT Head"},
+                {"name": "Dhvani Patel", "role": "Business Development Executive"},
+                {"name": "Kathan Rana", "role": "Business Development Executive"},
+                {"name": "Shruti Shendge", "role": "Client Engagement Executive"},
+                {"name": "Kathan Bhatt", "role": "Business Development Executive"},
+                {"name": "Aadil Lafavala", "role": "Data Executive"}
             ])
             
             await db.commit()

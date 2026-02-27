@@ -2,7 +2,7 @@
 Auth service — QR-based registration and JWT issuance.
 
 Handles:
-  1. User get-or-create (idempotent by email)
+  1. User lookup by email OR phone (pre-registered whitelist)
   2. Event validation
   3. Registration record
   4. JWT token with event-scoped claims
@@ -42,7 +42,7 @@ class AuthService:
         """
         Full registration flow:
         1. Validate event exists + is active
-        2. Get or create user (idempotent on email)
+        2. Look up user by email OR phone (whichever was provided)
         3. Create registration (fail if already registered — idempotent)
         4. Track session in Redis
         5. Issue JWT
@@ -55,7 +55,13 @@ class AuthService:
             raise NotFoundError("Event is no longer active")
 
         # 2. Look up existing user — only pre-registered users can log in
-        user = await self._user_repo.get_by_email(payload.email)
+        #    Try email first, then phone
+        user = None
+        if payload.email:
+            user = await self._user_repo.get_by_email(payload.email)
+        if not user and payload.phone:
+            user = await self._user_repo.get_by_phone(payload.phone)
+
         if not user:
             raise NotFoundError(
                 "You are not registered for this event. Please contact the organizer."
@@ -90,4 +96,11 @@ class AuthService:
             user_id=user.id,
             event_id=event.id,
             access_token=token,
+            user_name=user.name,
+            user_email=user.email,
+            user_phone=user.phone,
+            user_company=getattr(user, "company", None),
+            user_food_preference=getattr(user, "food_preference", None),
+            user_tshirt_size=getattr(user, "tshirt_size", None),
+            user_growth_focus=getattr(user, "growth_focus", None),
         )

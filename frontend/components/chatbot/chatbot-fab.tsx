@@ -2,10 +2,403 @@
 
 import { useRef, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { MessageSquare, Send, X, Loader2, Bot } from "lucide-react";
+import { Send, X, Loader2, Bot } from "lucide-react";
 import { chatbotApi } from "@/lib/api";
 import { useChatStore } from "@/store/chat";
 import { useAuthStore } from "@/store/auth";
+
+type CuratedFaqRule = {
+  keywords: string[];
+  response: string;
+};
+
+const GREETINGS = ["hi", "hello", "hey", "greetings", "good morning", "good afternoon", "good evening"];
+
+function normalizeFaqText(value: string): string {
+  return value
+    .toLowerCase()
+    .replace(/[–—]/g, " ")
+    .replace(/[^a-z0-9\s]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function toBullets(lines: string[]): string {
+  const cleaned = lines.map((line) => line.trim()).filter(Boolean);
+  if (cleaned.length === 0) return "";
+  return `Key Points:\n- ${cleaned.join("\n- ")}`;
+}
+
+const CURATED_FAQ_RULES: CuratedFaqRule[] = [
+  {
+    keywords: ["automation", "save", "time", "scale"],
+    response: toBullets([
+      "Automate onboarding, KYC follow-ups, and meeting summaries to remove repetitive work.",
+      "Use AI copilots for first drafts, then review before client send.",
+      "Reinvest saved hours into advisory calls and revenue conversations.",
+    ]),
+  },
+  {
+    keywords: ["daily", "business", "operations"],
+    response: toBullets([
+      "Start with high-frequency workflows: onboarding, documentation, reminders, and reporting.",
+      "Track three KPIs weekly: turnaround time, error rate, and conversion.",
+    ]),
+  },
+  {
+    keywords: ["tools", "new", "tech", "adoption"],
+    response: toBullets([
+      "Begin with one CRM, one automation layer, and one AI assistant.",
+      "Roll out one use-case at a time for 30 days before adding more tools.",
+    ]),
+  },
+  {
+    keywords: ["client", "engagement", "reporting"],
+    response: toBullets([
+      "Use AI for personalized nudges based on client goals and portfolio behavior.",
+      "Keep human calls for major decisions and trust-building conversations.",
+    ]),
+  },
+  {
+    keywords: ["mistakes", "adopting", "digital", "tools"],
+    response: toBullets([
+      "Buying too many tools before defining one measurable outcome.",
+      "Ignoring data quality and compliance checkpoints.",
+      "Automating without ownership and review rhythm.",
+    ]),
+  },
+  {
+    keywords: ["balance", "personal", "connect", "digital"],
+    response: toBullets([
+      "Use digital systems for repeatable tasks and reminders.",
+      "Use personal touch for advice, objections, and goal reviews.",
+    ]),
+  },
+  {
+    keywords: ["right", "time", "hire", "first", "team"],
+    response: toBullets([
+      "Hire when founder time is blocked by repeatable non-advisory tasks.",
+      "Define role outcomes before hiring: service quality, compliance, or revenue support.",
+    ]),
+  },
+  {
+    keywords: ["define", "roles", "business", "small"],
+    response: toBullets([
+      "Split ownership into client service, operations, and compliance.",
+      "Set one owner and 2-3 measurable KPIs per role.",
+    ]),
+  },
+  {
+    keywords: ["ownership", "mindset", "dependency"],
+    response: toBullets([
+      "Assign outcomes, not just tasks, with clear decision boundaries.",
+      "Run weekly reviews with evidence-based feedback.",
+    ]),
+  },
+  {
+    keywords: ["track", "team", "productivity"],
+    response: toBullets([
+      "Track throughput, turnaround time, and quality/compliance errors.",
+      "Use one dashboard and review trends every week.",
+    ]),
+  },
+  {
+    keywords: ["hire", "skill", "attitude"],
+    response: toBullets([
+      "Early-stage teams should prioritize attitude and learning speed.",
+      "Validate baseline skill through scenario-based tasks.",
+    ]),
+  },
+  {
+    keywords: ["meaningful", "professional", "relationships", "events"],
+    response: toBullets([
+      "Follow up with context + value, not only requests.",
+      "Build consistency with periodic insights, intros, or collaboration ideas.",
+    ]),
+  },
+  {
+    keywords: ["networking", "quantity", "quality"],
+    response: toBullets([
+      "Start quality-first with high-fit peers in your niche.",
+      "Expand quantity only after building a reliable core network.",
+    ]),
+  },
+  {
+    keywords: ["follow", "up", "transactional"],
+    response: toBullets([
+      "Reference the last discussion and add one useful takeaway/resource.",
+      "Use a light cadence and ask for value-aligned next steps.",
+    ]),
+  },
+  {
+    keywords: ["collaboration", "opportunities"],
+    response: toBullets([
+      "Start with a low-risk pilot such as co-webinar or co-referral workflow.",
+      "Define owner, timeline, and success metric before launch.",
+    ]),
+  },
+  {
+    keywords: ["value", "proposition", "prospects"],
+    response: toBullets([
+      "Use one-line clarity: who you help, what problem, what measurable outcome.",
+      "Support with one proof metric and one client story.",
+    ]),
+  },
+  {
+    keywords: ["storytelling", "client", "conversations"],
+    response: toBullets([
+      "Use Problem -> Action -> Result stories to simplify complex financial concepts.",
+      "End each story with a clear client next step.",
+    ]),
+  },
+  {
+    keywords: ["difficult", "client", "conversations"],
+    response: toBullets([
+      "Lead with empathy, align on facts, and present option trade-offs.",
+      "Close with documented action items, owners, and timelines.",
+    ]),
+  },
+  {
+    keywords: ["objective", "group", "discussion"],
+    response: toBullets([
+      "Convert ideas into practical actions for growth, compliance, and client outcomes.",
+      "Leverage peer inputs to leave with implementable next steps.",
+    ]),
+  },
+  {
+    keywords: ["outcome", "end", "session"],
+    response: toBullets([
+      "You should leave with 2-3 concrete actions and a 30-day execution plan.",
+      "Capture accountability partners and measurable checkpoints.",
+    ]),
+  },
+  {
+    keywords: ["time", "discipline", "group"],
+    response: toBullets([
+      "Use fixed speaking slots and problem -> action -> result format.",
+      "Park deep dives and close with owner + deadline for each action.",
+    ]),
+  },
+  {
+    keywords: ["tool", "demonstrations"],
+    response: toBullets([
+      "Discussion is primary, with practical BFSI + AI examples.",
+      "Live demonstrations can be covered in focused Q&A segments.",
+    ]),
+  },
+  {
+    keywords: ["platform", "queries"],
+    response: toBullets([
+      "Yes, platform-specific questions are welcome.",
+      "Share your exact use case, constraints, and expected output for better guidance.",
+    ]),
+  },
+  {
+    keywords: ["resources", "tool", "lists", "shared"],
+    response: toBullets([
+      "Yes, practical tool references and rollout notes can be shared post-session.",
+      "Prioritize tools by business use case, not by popularity.",
+    ]),
+  },
+  {
+    keywords: ["time", "available", "q", "a"],
+    response: toBullets([
+      "Q&A windows are focused and time-boxed within each discussion block.",
+      "Use concise, scenario-based questions for faster and better answers.",
+    ]),
+  },
+  {
+    keywords: ["team", "challenges", "openly"],
+    response: toBullets([
+      "Yes, practical team challenges can be discussed openly.",
+      "Share context safely and avoid exposing sensitive client details.",
+    ]),
+  },
+  {
+    keywords: ["templates", "role", "clarity", "review"],
+    response: toBullets([
+      "Yes, role clarity and review cadence templates can be used.",
+      "Keep the template simple: owner, KPI, review frequency, and next action.",
+    ]),
+  },
+  {
+    keywords: ["discussion", "confidential", "group"],
+    response: toBullets([
+      "Treat group discussions as confidential and professional.",
+      "Discuss patterns and scenarios without client-identifying information.",
+    ]),
+  },
+  {
+    keywords: ["examples", "real", "practices"],
+    response: toBullets([
+      "Yes, examples are usually shared from real operating contexts.",
+      "The focus remains on replicable frameworks, not one-off anecdotes.",
+    ]),
+  },
+  {
+    keywords: ["interaction", "activities", "group"],
+    response: toBullets([
+      "Yes, the format includes interactive sharing activities.",
+      "Keep your inputs concise so more participants can contribute.",
+    ]),
+  },
+  {
+    keywords: ["exchange", "contacts", "session"],
+    response: toBullets([
+      "Yes, contact exchange is encouraged.",
+      "Add one clear next step while exchanging details to avoid dead follow-ups.",
+    ]),
+  },
+  {
+    keywords: ["structured", "networking", "open", "discussion"],
+    response: toBullets([
+      "Both formats are used: structured rounds for breadth, open discussion for depth.",
+      "Use whichever format to finalize one practical collaboration next step.",
+    ]),
+  },
+  {
+    keywords: ["sharing", "experiences"],
+    response: toBullets([
+      "Experience-sharing windows are distributed across participants.",
+      "Use a short problem -> action -> result format for best clarity.",
+    ]),
+  },
+  {
+    keywords: ["role", "plays", "discussion"],
+    response: toBullets([
+      "Both discussion and role-play can be included.",
+      "Role-play is used to practice execution, objection handling, and clarity.",
+    ]),
+  },
+  {
+    keywords: ["real", "communication", "scenarios"],
+    response: toBullets([
+      "Yes, real communication scenarios are welcome.",
+      "Mask sensitive client details and focus on decision context and outcome.",
+    ]),
+  },
+  {
+    keywords: ["feedback", "given", "exercises"],
+    response: toBullets([
+      "Yes, feedback is typically structured and practical.",
+      "Apply feedback immediately in the next attempt for faster improvement.",
+    ]),
+  },
+  {
+    keywords: ["communication", "templates", "shared"],
+    response: toBullets([
+      "Yes, concise communication templates can be shared.",
+      "Use them as a base and personalize by client segment.",
+    ]),
+  },
+  {
+    keywords: ["interactive", "session"],
+    response: toBullets([
+      "The session is designed to be highly interactive.",
+      "Participation quality directly improves the value you get.",
+    ]),
+  },
+  {
+    keywords: ["take", "notes", "reflections"],
+    response: toBullets([
+      "Yes, quick notes and reflections are recommended.",
+      "Capture key insight + next action + owner for execution clarity.",
+    ]),
+  },
+  {
+    keywords: ["summary", "takeaway", "capture"],
+    response: toBullets([
+      "Yes, key takeaways can be captured and shared after the discussion.",
+      "Convert each takeaway into one measurable action item.",
+    ]),
+  },
+];
+
+function getCuratedFaqAnswer(query: string): string | null {
+  const normalized = normalizeFaqText(query);
+  if (!normalized) return null;
+
+  if (GREETINGS.some((g) => normalized === g || normalized.startsWith(g + " "))) {
+    return "Hello! Welcome to Raj Darbar 2026. How can I help you today? You can ask me about the schedule, speakers, or any event details.";
+  }
+
+  const direct = CURATED_FAQ_RULES.find((rule) =>
+    rule.keywords.every((keyword) => normalized.includes(keyword))
+  );
+  if (direct) return direct.response;
+
+  if (
+    ["technology", "automation", "digital", "kyc", "crm"].some((keyword) =>
+      normalized.includes(keyword)
+    )
+  ) {
+    return toBullets([
+      "In BFSI, start AI adoption with compliance-safe, repetitive workflows first.",
+      "Prioritize one measurable use case and review impact weekly.",
+    ]);
+  }
+
+  if (
+    ["team", "hire", "attrition", "productivity", "ownership"].some((keyword) =>
+      normalized.includes(keyword)
+    )
+  ) {
+    return toBullets([
+      "Set role clarity and outcome KPIs before scaling headcount.",
+      "Run weekly execution reviews and monthly development reviews.",
+    ]);
+  }
+
+  if (
+    ["networking", "collaboration", "follow up", "relationships"].some((keyword) =>
+      normalized.includes(keyword)
+    )
+  ) {
+    return toBullets([
+      "Use a Meet -> Nurture -> Collaborate rhythm for stronger outcomes.",
+      "Focus on value-driven follow-ups and pilot collaboration opportunities.",
+    ]);
+  }
+
+  if (
+    ["communication", "storytelling", "value proposition", "role play"].some((keyword) =>
+      normalized.includes(keyword)
+    )
+  ) {
+    return toBullets([
+      "Keep communication outcome-first, concise, and client-context driven.",
+      "Use structured conversations with clear next steps and owners.",
+    ]);
+  }
+
+  return null;
+}
+
+function shouldUseCuratedFallback(text: string): boolean {
+  const normalized = normalizeFaqText(text);
+  return (
+    normalized.includes("does not contain the answer") ||
+    normalized.includes("context does not contain") ||
+    normalized.includes("could not find") ||
+    normalized.includes("don t contain the answer")
+  );
+}
+
+function formatAssistantReply(text: string): string {
+  const raw = text.trim();
+  if (!raw) return raw;
+  if (raw.includes("\n- ") || raw.startsWith("- ")) return raw;
+  if (raw.length < 260) return raw;
+
+  const sentences = raw
+    .replace(/\s+/g, " ")
+    .split(/(?<=[.!?])\s+/)
+    .map((sentence) => sentence.trim())
+    .filter(Boolean);
+  if (sentences.length < 2) return raw;
+
+  return toBullets(sentences.slice(0, 6));
+}
 
 export default function ChatbotFAB({ eventId }: { eventId: string }) {
   const token = useAuthStore((s) => s.token) ?? "";
@@ -21,15 +414,18 @@ export default function ChatbotFAB({ eventId }: { eventId: string }) {
         className="chatbot-fab"
         style={{
           position: "fixed", bottom: "24px", right: "24px", zIndex: 50,
-          width: "56px", height: "56px", borderRadius: "50%",
+          height: "52px", borderRadius: "26px",
+          padding: "0 20px",
           background: "linear-gradient(135deg, #8B0000, #DC143C)",
           color: "#fff", border: "none", cursor: "pointer",
-          display: "flex", alignItems: "center", justifyContent: "center",
+          display: "flex", alignItems: "center", justifyContent: "center", gap: "10px",
           boxShadow: "0 8px 24px rgba(220,20,60,0.4)",
+          fontSize: "14px", fontWeight: 600,
         }}
         aria-label="Open AI assistant"
       >
-        {isOpen ? <X style={{ width: "22px", height: "22px" }} /> : <MessageSquare style={{ width: "22px", height: "22px" }} />}
+        {isOpen ? <X style={{ width: "20px", height: "20px" }} /> : <Bot style={{ width: "20px", height: "20px" }} />}
+        <span>{isOpen ? "Close" : "AI Assistant"}</span>
       </motion.button>
 
       {/* Chat Drawer */}
@@ -69,13 +465,41 @@ function ChatPanel({ eventId, token }: { eventId: string; token: string }) {
   }, [messages]);
 
   const handleSend = useCallback(async (query: string) => {
-    if (!query.trim() || isLoading) return;
-    addMessage({ id: Date.now().toString(), role: "user", content: query.trim(), timestamp: Date.now() });
+    const cleanedQuery = query.trim();
+    if (!cleanedQuery || isLoading) return;
+
+    addMessage({ id: Date.now().toString(), role: "user", content: cleanedQuery, timestamp: Date.now() });
     setLoading(true);
 
     try {
-      const res = await chatbotApi.query({ event_id: eventId, query: query.trim() }, token);
-      addMessage({ id: (Date.now() + 1).toString(), role: "assistant", content: res.response, sources: res.sources, timestamp: Date.now() });
+      const curatedBeforeApi = getCuratedFaqAnswer(cleanedQuery);
+      if (curatedBeforeApi) {
+        addMessage({
+          id: (Date.now() + 1).toString(),
+          role: "assistant",
+          content: curatedBeforeApi,
+          sources: ["curated_frontend_faq"],
+          timestamp: Date.now(),
+        });
+        return;
+      }
+
+      // Prepare conversation history (up to last 10 messages, omitting the one just added)
+      const historyPayload = messages
+        .slice(-10)
+        .map(m => ({ role: m.role, content: m.content }));
+
+      const res = await chatbotApi.query({ 
+        event_id: eventId, 
+        query: cleanedQuery,
+        history: historyPayload.length > 0 ? historyPayload : undefined,
+      }, token);
+      
+      const curatedAfterApi = shouldUseCuratedFallback(res.response)
+        ? getCuratedFaqAnswer(cleanedQuery)
+        : null;
+      const responseText = curatedAfterApi ?? formatAssistantReply(res.response);
+      addMessage({ id: (Date.now() + 1).toString(), role: "assistant", content: responseText, sources: res.sources, timestamp: Date.now() });
     } catch {
       addMessage({ id: (Date.now() + 1).toString(), role: "assistant", content: "Sorry, I encountered an error. Please try again.", timestamp: Date.now() });
     } finally {
@@ -131,12 +555,36 @@ function ChatPanel({ eventId, token }: { eventId: string; token: string }) {
               </div>
             )}
             <div style={{
-              maxWidth: "80%", padding: "12px 16px", borderRadius: "16px", fontSize: "13px", lineHeight: 1.7,
+              maxWidth: "80%", padding: "12px 16px", borderRadius: "16px", fontSize: "14px", lineHeight: 1.6,
               ...(msg.role === "user"
                 ? { background: "linear-gradient(135deg, #8B0000, #DC143C)", color: "#fff", borderBottomRightRadius: "4px" }
                 : { background: "#f5f5f5", color: "#333", borderBottomLeftRadius: "4px" }),
             }}>
-              {msg.content}
+              {msg.content.split("\n").map((line, i) => {
+                const trimmed = line.trim();
+                const isListItem = trimmed.startsWith("- ") || trimmed.startsWith("* ");
+                const content = isListItem ? trimmed.substring(2) : line;
+                
+                // Bold formatting
+                const parts = content.split(/(\*\*.*?\*\*)/g);
+                const formattedLine = parts.map((part, j) => {
+                  if (part.startsWith("**") && part.endsWith("**")) {
+                    return <strong key={j}>{part.slice(2, -2)}</strong>;
+                  }
+                  return part;
+                });
+            
+                if (isListItem) {
+                  return (
+                    <div key={i} style={{ display: "flex", gap: "6px", marginTop: "4px" }}>
+                      <span style={{ color: "#8B0000" }}>•</span>
+                      <span>{formattedLine}</span>
+                    </div>
+                  );
+                }
+                
+                return <div key={i} style={{ marginTop: i > 0 && !content ? "4px" : "0", minHeight: content ? "auto" : "8px" }}>{formattedLine}</div>;
+              })}
             </div>
           </motion.div>
         ))}

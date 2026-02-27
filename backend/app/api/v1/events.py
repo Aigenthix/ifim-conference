@@ -4,11 +4,15 @@ from __future__ import annotations
 from fastapi import APIRouter, Query
 
 from app.api.deps import CurrentUser, DBSession, Redis
+from app.core.exceptions import ForbiddenError, NotFoundError
+from app.repositories.event_repo import EventRepository
+from app.schemas.admin import DashboardResponse
 from app.schemas.event import (
     EventCreateRequest,
     EventLobbyResponse,
     StrategyCompassTopicsResponse,
 )
+from app.services.analytics_service import AnalyticsService
 from app.services.event_service import EventService
 from app.services.strategy_compass_service import StrategyCompassService
 
@@ -65,3 +69,26 @@ async def get_strategy_compass_topics(
         user_event_id=user.event_id,
         count=count,
     )
+
+
+@router.get(
+    "/{slug}/dashboard",
+    response_model=DashboardResponse,
+    summary="Get event dashboard metrics",
+    description="Returns live dashboard stats for the attendee's event.",
+)
+async def get_event_dashboard(
+    slug: str,
+    user: CurrentUser,
+    session: DBSession,
+    redis: Redis,
+) -> DashboardResponse:
+    event_repo = EventRepository(session)
+    event = await event_repo.get_by_slug(slug)
+    if not event:
+        raise NotFoundError(f"Event '{slug}' not found")
+    if event.id != user.event_id:
+        raise ForbiddenError("You are not authorized to access this event")
+
+    service = AnalyticsService(session=session, redis=redis)
+    return await service.get_dashboard(event.id)

@@ -13,6 +13,10 @@ class User(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     email: Mapped[str] = mapped_column(String(320), nullable=False)
     phone: Mapped[str] = mapped_column(String(20), nullable=False)
+    company: Mapped[str | None] = mapped_column(String(255), nullable=True, default=None)
+    food_preference: Mapped[str | None] = mapped_column(String(50), nullable=True, default=None)
+    tshirt_size: Mapped[str | None] = mapped_column(String(10), nullable=True, default=None)
+    growth_focus: Mapped[str | None] = mapped_column(String(255), nullable=True, default=None)
 
     # Relationships
     registrations = relationship("Registration", back_populates="user", lazy="selectin")

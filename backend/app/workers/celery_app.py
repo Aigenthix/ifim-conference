@@ -17,6 +17,7 @@ celery_app = Celery(
     "event_platform",
     broker=settings.CELERY_BROKER_URL,
     backend=settings.CELERY_RESULT_BACKEND,
+    include=["app.workers.email_tasks"],
 )
 
 celery_app.conf.update(

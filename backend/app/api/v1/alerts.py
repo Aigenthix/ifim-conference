@@ -106,3 +106,44 @@ async def create_alert(
     await redis.publish(f"alerts:{payload.event_id}", alert_data)
 
     return _alert_to_response(new_alert)
+
+
+# ── Admin: auto-alert scheduler toggle ────────────────────
+
+class AutoAlertStatusResponse(BaseModel):
+    enabled: bool
+
+
+class AutoAlertToggleRequest(BaseModel):
+    enabled: bool
+
+
+@router.get(
+    "/auto/{event_id}",
+    response_model=AutoAlertStatusResponse,
+    summary="Get auto-alert scheduler status",
+)
+async def get_auto_alert_status(
+    event_id: str,
+    user: CurrentUser,
+    redis: Redis,
+) -> AutoAlertStatusResponse:
+    from app.services.auto_alert_scheduler import get_auto_alert_status as _get_status
+    enabled = await _get_status(redis, event_id)
+    return AutoAlertStatusResponse(enabled=enabled)
+
+
+@router.post(
+    "/auto/{event_id}",
+    response_model=AutoAlertStatusResponse,
+    summary="Enable/disable auto-alert scheduler",
+)
+async def toggle_auto_alerts(
+    event_id: str,
+    payload: AutoAlertToggleRequest,
+    user: CurrentUser,
+    redis: Redis,
+) -> AutoAlertStatusResponse:
+    from app.services.auto_alert_scheduler import set_auto_alert_status as _set_status
+    await _set_status(redis, event_id, payload.enabled)
+    return AutoAlertStatusResponse(enabled=payload.enabled)

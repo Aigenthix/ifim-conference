@@ -47,10 +47,28 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     # Start background poll generator
     poll_task = asyncio.create_task(_poll_generation_loop(redis))
 
+    # Start auto-alert scheduler for all active events
+    from app.services.auto_alert_scheduler import auto_alert_loop
+    from app.db.session import get_session_factory
+    from app.repositories.event_repo import EventRepository
+    alert_tasks = []
+    try:
+        factory = get_session_factory()
+        async with factory() as session:
+            repo = EventRepository(session)
+            events = await repo.get_active_events()
+            for ev in events:
+                t = asyncio.create_task(auto_alert_loop(str(ev.id)))
+                alert_tasks.append(t)
+    except Exception as exc:
+        logger.error(f"Failed to start auto-alert scheduler: {exc}")
+
     yield
 
     # ── Shutdown ───────────────────────────────────────────
     poll_task.cancel()
+    for t in alert_tasks:
+        t.cancel()
     await ws_manager.stop()
     await close_db()
 
@@ -140,6 +158,9 @@ def create_app() -> FastAPI:
     from app.api.v1.admin_auth import router as admin_auth_router
     from app.api.v1.sessions import router as sessions_router
     from app.api.v1.alerts import router as alerts_router
+    from app.api.v1.qa import router as qa_router
+    from app.api.v1.community import router as community_router
+    from app.api.v1.bulk_email import router as bulk_email_router
 
     api_prefix = "/api/v1"
     app.include_router(auth_router, prefix=api_prefix)
@@ -153,6 +174,9 @@ def create_app() -> FastAPI:
     app.include_router(admin_auth_router, prefix=api_prefix)
     app.include_router(sessions_router, prefix=api_prefix)
     app.include_router(alerts_router, prefix=api_prefix)
+    app.include_router(qa_router, prefix=api_prefix)
+    app.include_router(community_router, prefix=api_prefix)
+    app.include_router(bulk_email_router, prefix=api_prefix)
 
     # ── WebSocket routes ───────────────────────────────────
     from app.websocket.poll_ws import router as poll_ws_router

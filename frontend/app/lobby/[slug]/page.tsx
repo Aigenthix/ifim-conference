@@ -1,14 +1,16 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Home, BarChart3, Image, MessageSquare, Award, LogOut, Mic, Bell, Compass } from "lucide-react";
+import { Home, BarChart3, Image, MessageSquare, Award, LogOut, Mic, Bell, Compass, HelpCircle, MessageCircle, LayoutDashboard, MoreHorizontal } from "lucide-react";
+import { toast } from "sonner";
 import { useAuthStore } from "@/store/auth";
-import { eventsApi } from "@/lib/api";
+import { eventsApi, alertsApi } from "@/lib/api";
 import type { EventLobby } from "@/lib/api";
 
 import LobbyOverview from "@/components/lobby/lobby-overview";
+import DashboardSection from "@/components/lobby/dashboard-section";
 import LivePolls from "@/components/polls/live-polls";
 import GallerySection from "@/components/lobby/gallery-section";
 import FeedbackSection from "@/components/lobby/feedback-section";
@@ -17,7 +19,10 @@ import SessionsSection from "@/components/lobby/sessions-section";
 import AlertsSection from "@/components/lobby/alerts-section";
 import StrategyCompassSection from "@/components/lobby/strategy-compass-section";
 import ChatbotFAB from "@/components/chatbot/chatbot-fab";
-import { GoldCoinRain } from "@/components/ui/gold-coin-rain";
+import QASection from "@/components/lobby/qa-section";
+import CommunityChatSection from "@/components/lobby/community-chat-section";
+
+const ALERT_POLL_BASE_MS = 12_000;
 
 const SECTIONS = [
   { id: "overview", label: "Overview", icon: Home },
@@ -28,6 +33,9 @@ const SECTIONS = [
   { id: "gallery", label: "Gallery", icon: Image },
   { id: "feedback", label: "Feedback", icon: MessageSquare },
   { id: "certificate", label: "Certificate", icon: Award },
+  { id: "qa", label: "Q&A", icon: HelpCircle },
+  { id: "community", label: "Community Chat", icon: MessageCircle },
+  { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
 ] as const;
 
 type Section = typeof SECTIONS[number]["id"];
@@ -39,8 +47,106 @@ export default function LobbyPage({ params }: { params: Promise<{ slug: string }
   const [lobby, setLobby] = useState<EventLobby | null>(null);
   const [active, setActive] = useState<Section>("overview");
   const [loading, setLoading] = useState(true);
+  const lastAlertIdRef = useRef<string | null>(null);
+  const mobileBarRef = useRef<HTMLDivElement>(null);
+  const [showRightFade, setShowRightFade] = useState(true);
+
+  const handleMobileScroll = () => {
+    if (mobileBarRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = mobileBarRef.current;
+      setShowRightFade(scrollLeft + clientWidth < scrollWidth - 10);
+    }
+  };
+
+  useEffect(() => {
+    handleMobileScroll();
+    window.addEventListener('resize', handleMobileScroll);
+    return () => window.removeEventListener('resize', handleMobileScroll);
+  }, [lobby]);
 
   useEffect(() => { params.then((p) => setSlug(p.slug)); }, [params]);
+
+  // ── Live Alert Popup ─────────────────────────────────
+  useEffect(() => {
+    if (!token || !lobby) return;
+    const eventId = lobby.id;
+
+    const pollAlerts = async () => {
+      try {
+        const data = await alertsApi.getEventAlerts(eventId, token);
+        const alerts = data?.alerts ?? [];
+        if (alerts.length > 0) {
+          const latest = alerts[0];
+          if (lastAlertIdRef.current && lastAlertIdRef.current !== latest.id) {
+            // New alert detected — show popup
+            toast(
+              <div style={{ display: "flex", alignItems: "flex-start", gap: "12px" }}>
+                <div style={{
+                  width: "36px", height: "36px", borderRadius: "10px", flexShrink: 0,
+                  background: "linear-gradient(135deg, #8B0000, #DC143C)",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                }}>
+                  <Bell style={{ width: "18px", height: "18px", color: "#fff" }} />
+                </div>
+                <div>
+                  <p style={{ fontWeight: 700, fontSize: "14px", margin: "0 0 4px", color: "#111" }}>{latest.title}</p>
+                  <p style={{ fontSize: "13px", color: "#555", margin: 0 }}>{latest.message}</p>
+                </div>
+              </div>,
+              {
+                duration: 8000,
+                position: "top-center",
+                style: {
+                  background: "#fff",
+                  border: "1px solid #fecaca",
+                  boxShadow: "0 8px 32px rgba(139,0,0,0.15)",
+                  borderRadius: "14px",
+                  padding: "16px",
+                },
+              }
+            );
+          }
+          lastAlertIdRef.current = latest.id;
+        }
+      } catch { /* ignore polling errors */ }
+    };
+
+    let timer: number | null = null;
+    let active = true;
+    const scheduleNext = () => {
+      if (!active) return;
+      const jitter = Math.floor(Math.random() * 2_500);
+      timer = window.setTimeout(() => {
+        void tick();
+      }, ALERT_POLL_BASE_MS + jitter);
+    };
+
+    const tick = async () => {
+      if (!active) return;
+      if (document.visibilityState === "visible") {
+        await pollAlerts();
+      }
+      scheduleNext();
+    };
+
+    const onVisibilityChange = () => {
+      if (document.visibilityState === "visible") {
+        void pollAlerts();
+      }
+    };
+
+    void pollAlerts(); // initial fetch to seed lastAlertIdRef
+    scheduleNext();
+    document.addEventListener("visibilitychange", onVisibilityChange);
+
+    return () => {
+      active = false;
+      if (timer !== null) {
+        window.clearTimeout(timer);
+      }
+      document.removeEventListener("visibilitychange", onVisibilityChange);
+    };
+  }, [token, lobby]);
 
   useEffect(() => {
     if (!_hasHydrated || !slug) return; // wait for zustand to rehydrate from localStorage
@@ -73,21 +179,138 @@ export default function LobbyPage({ params }: { params: Promise<{ slug: string }
       <style>{`
         @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
 
-        .desktop-tabs { display: flex; gap: 2px; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
-        .desktop-tabs::-webkit-scrollbar { display: none; }
+        .topbar-nav {
+          max-width: 1180px;
+          margin: 0 auto;
+          display: grid;
+          grid-template-columns: 168px minmax(0, 1fr) 168px;
+          align-items: center;
+          gap: 10px;
+          padding: 0 16px;
+          height: 62px;
+        }
+        .topbar-left {
+          width: 168px;
+          display: flex;
+          align-items: center;
+        }
+        .topbar-logo {
+          height: 36px;
+          width: auto;
+          border-radius: 8px;
+          flex-shrink: 0;
+          object-fit: contain;
+          background: rgba(255,255,255,0.92);
+          padding: 4px 8px;
+        }
+        .desktop-tabs-shell {
+          min-width: 0;
+          overflow-x: auto;
+          -webkit-overflow-scrolling: touch;
+          scrollbar-width: none;
+          display: flex;
+          justify-content: flex-start;
+        }
+        .desktop-tabs-shell::-webkit-scrollbar { display: none; }
+        .desktop-tabs {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          min-width: max-content;
+          padding: 2px;
+          margin: 0 auto;
+        }
+        .desktop-tab-btn {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          height: 36px;
+          padding: 0 13px;
+          border-radius: 10px;
+          border: none;
+          cursor: pointer;
+          font-size: 12px;
+          font-weight: 600;
+          line-height: 1;
+          transition: all 0.18s;
+          white-space: nowrap;
+        }
+        .topbar-right {
+          width: 168px;
+          display: flex;
+          align-items: center;
+          justify-content: flex-end;
+          gap: 8px;
+        }
+        .topbar-live-pill {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          height: 32px;
+          padding: 0 12px;
+          border-radius: 999px;
+          background: rgba(255,255,255,0.16);
+          font-size: 12px;
+          color: #fff;
+          font-weight: 600;
+          line-height: 1;
+        }
+        .topbar-logout-btn {
+          width: 34px;
+          height: 34px;
+          border-radius: 10px;
+          border: none;
+          cursor: pointer;
+          color: rgba(255,255,255,0.82);
+          background: rgba(255,255,255,0.12);
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          transition: all 0.18s;
+        }
+        .topbar-logout-btn:hover {
+          background: rgba(255,255,255,0.2);
+          color: #fff;
+        }
+
         .mobile-bottom-bar { display: none; overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch; scrollbar-width: none; scroll-snap-type: x proximity; }
         .mobile-bottom-bar::-webkit-scrollbar { display: none; }
         .mobile-tab-track { display: flex; align-items: center; gap: 6px; min-width: max-content; padding: 0 2px; }
         .mobile-tab-btn { flex: 0 0 auto; min-width: 82px; max-width: 96px; scroll-snap-align: start; }
         .mobile-tab-label { display: block; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .mobile-scroll-indicator { display: none !important; }
         .header-logo-text { display: block; }
 
         @media (max-width: 900px) {
           .header-logo-text { display: none !important; }
+          .topbar-nav {
+            grid-template-columns: 142px minmax(0, 1fr) 142px;
+            padding: 0 12px;
+          }
+          .topbar-left,
+          .topbar-right {
+            width: 142px;
+          }
+          .desktop-tab-btn {
+            height: 34px;
+            padding: 0 11px;
+            font-size: 11px;
+          }
         }
         @media (max-width: 768px) {
-          .desktop-tabs { display: none !important; }
+          .topbar-nav {
+            height: 56px;
+            grid-template-columns: 1fr auto;
+            gap: 8px;
+          }
+          .topbar-left,
+          .topbar-right {
+            width: auto;
+          }
+          .desktop-tabs-shell { display: none !important; }
+          .topbar-live-pill { display: none; }
           .mobile-bottom-bar { display: flex !important; }
+          .mobile-scroll-indicator { display: flex !important; }
         }
       `}</style>
 
@@ -97,52 +320,48 @@ export default function LobbyPage({ params }: { params: Promise<{ slug: string }
         position: "sticky", top: 0, zIndex: 50,
         boxShadow: "0 4px 20px rgba(139,0,0,0.3)",
       }}>
-        <nav style={{
-          maxWidth: "1080px", margin: "0 auto",
-          display: "flex", alignItems: "center", justifyContent: "space-between",
-          padding: "0 16px", height: "56px",
-        }}>
+        <nav className="topbar-nav">
           {/* Logo */}
-          <div style={{ display: "flex", alignItems: "center", gap: "10px", minWidth: 0 }}>
-            <img src="/logo.png" alt="Raj Darbar" style={{
-              height: "32px", width: "auto", borderRadius: "6px", flexShrink: 0,
-              objectFit: "contain", background: "rgba(255,255,255,0.9)",
-              padding: "3px 6px",
-            }} />
-
+          <div className="topbar-left">
+            <img src="/logo.png" alt="Raj Darbar" className="topbar-logo" />
           </div>
 
           {/* Desktop Tabs */}
-          <div className="desktop-tabs">
-            {SECTIONS.map((s) => {
-              const Icon = s.icon;
-              const isActive = active === s.id;
-              return (
-                <button key={s.id} onClick={() => setActive(s.id)} style={{
-                  display: "flex", alignItems: "center", gap: "4px", // Reduced from 6px
-                  padding: "6px 10px", // Reduced from 8px 14px
-                  borderRadius: "8px", border: "none", cursor: "pointer",
-                  fontSize: "12px", // Slightly smaller text to fit more tabs
-                  fontWeight: isActive ? 600 : 400,
-                  color: isActive ? "#fff" : "rgba(255,255,255,0.7)",
-                  background: isActive ? "rgba(255,255,255,0.2)" : "transparent",
-                  transition: "all 0.15s",
-                  minWidth: "max-content", // Prevent text wrapping
-                }}>
-                  <Icon style={{ width: "14px", height: "14px" }} />{s.label}
-                </button>
-              );
-            })}
+          <div className="desktop-tabs-shell">
+            <div className="desktop-tabs">
+              {SECTIONS.map((s) => {
+                const Icon = s.icon;
+                const isActive = active === s.id;
+                return (
+                  <button
+                    key={s.id}
+                    className="desktop-tab-btn"
+                    onClick={() => setActive(s.id)}
+                    style={{
+                      color: isActive ? "#fff" : "rgba(255,255,255,0.8)",
+                      background: isActive ? "rgba(255,255,255,0.22)" : "transparent",
+                    }}
+                  >
+                    <Icon style={{ width: "14px", height: "14px", flexShrink: 0 }} />
+                    {s.label}
+                  </button>
+                );
+              })}
+            </div>
           </div>
 
           {/* Right side */}
-          <div style={{ display: "flex", alignItems: "center", gap: "8px", flexShrink: 0 }}>
+          <div className="topbar-right">
             {lobby.is_active && (
-              <div style={{ display: "flex", alignItems: "center", gap: "5px", padding: "5px 12px", borderRadius: "999px", background: "rgba(255,255,255,0.15)", fontSize: "12px", color: "#fff", fontWeight: 500 }}>
+              <div className="topbar-live-pill">
                 <span style={{ width: "7px", height: "7px", borderRadius: "50%", background: "#4ade80", boxShadow: "0 0 6px #4ade80", animation: "pulse 2s infinite" }} />Live
               </div>
             )}
-            <button onClick={() => { logout(); if (slug) router.replace(`/register/${slug}`); }} style={{ background: "rgba(255,255,255,0.1)", border: "none", borderRadius: "8px", padding: "8px", cursor: "pointer", color: "rgba(255,255,255,0.7)" }}>
+            <button
+              className="topbar-logout-btn"
+              onClick={() => { logout(); if (slug) router.replace(`/register/${slug}`); }}
+              aria-label="Logout"
+            >
               <LogOut style={{ width: "16px", height: "16px" }} />
             </button>
           </div>
@@ -154,6 +373,9 @@ export default function LobbyPage({ params }: { params: Promise<{ slug: string }
         <AnimatePresence mode="wait">
           <motion.div key={active} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }} transition={{ duration: 0.2 }}>
             {active === "overview" && <LobbyOverview lobby={lobby} />}
+            {active === "dashboard" && (
+              <DashboardSection eventSlug={lobby.slug} eventId={lobby.id} token={token ?? ""} />
+            )}
             {active === "sessions" && <SessionsSection eventId={lobby.id} />}
             {active === "polls" && <LivePolls eventId={lobby.id} />}
             {active === "strategy-compass" && (
@@ -163,12 +385,17 @@ export default function LobbyPage({ params }: { params: Promise<{ slug: string }
             {active === "gallery" && <GallerySection eventId={lobby.id} />}
             {active === "feedback" && <FeedbackSection eventId={lobby.id} />}
             {active === "certificate" && <CertificateSection eventId={lobby.id} />}
+            {active === "qa" && <QASection eventId={lobby.id} />}
+            {active === "community" && <CommunityChatSection eventId={lobby.id} />}
           </motion.div>
         </AnimatePresence>
       </main>
 
       {/* Mobile Bottom Tab Bar */}
-      <div className="mobile-bottom-bar" style={{
+      <div 
+        ref={mobileBarRef}
+        onScroll={handleMobileScroll}
+        className="mobile-bottom-bar" style={{
         position: "fixed", bottom: 0, left: 0, right: 0, zIndex: 50,
         background: "#fff",
         borderTop: "1px solid #eee",
@@ -214,8 +441,21 @@ export default function LobbyPage({ params }: { params: Promise<{ slug: string }
         </div>
       </div>
 
+      {/* Scroll indicator overlay */}
+      {showRightFade && (
+        <div className="mobile-scroll-indicator" style={{
+          position: "fixed", bottom: 0, right: 0, zIndex: 51,
+          height: "calc(max(6px, env(safe-area-inset-bottom)) + 58px)",
+          width: "48px",
+          background: "linear-gradient(to right, transparent, rgba(255,255,255,0.95) 40%, #fff)",
+          display: "flex", alignItems: "center", justifyContent: "flex-end", paddingRight: "10px",
+          pointerEvents: "none"
+        }}>
+          <MoreHorizontal style={{ color: "#aaa", width: "20px" }} />
+        </div>
+      )}
+
       <ChatbotFAB eventId={lobby.id} />
-      <GoldCoinRain />
     </div>
   );
 }

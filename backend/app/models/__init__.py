@@ -14,6 +14,10 @@ from app.models.chat_log import ChatLog
 from app.models.admin import AdminUser
 from app.models.session import Session
 from app.models.alert import Alert
+from app.models.qa_question import QAQuestion
+from app.models.community_message import CommunityMessage
+from app.models.ticket import Ticket
+from app.models.food_attendance import FoodAttendance
 
 __all__ = [
     "User",
@@ -28,4 +32,8 @@ __all__ = [
     "AdminUser",
     "Session",
     "Alert",
+    "QAQuestion",
+    "CommunityMessage",
+    "Ticket",
+    "FoodAttendance",
 ]

@@ -256,6 +256,7 @@ export default function StrategyCompassSection({
   const [isSpinning, setIsSpinning] = useState(false);
   const [isLoadingTopics, setIsLoadingTopics] = useState(false);
   const [selectedTopic, setSelectedTopic] = useState<BfsiTopic | null>(null);
+  const [isMobileView, setIsMobileView] = useState(false);
   const spinTimeoutRef = useRef<number | null>(null);
   const wheelTopicsRef = useRef<BfsiTopic[]>(wheelTopics);
   const mountedRef = useRef(true);
@@ -274,6 +275,72 @@ export default function StrategyCompassSection({
       })
       .join(", ")})`;
   }, [wheelTopics, segmentAngle]);
+
+  useEffect(() => {
+    const media = window.matchMedia("(max-width: 768px)");
+    const apply = () => setIsMobileView(media.matches);
+    apply();
+    media.addEventListener("change", apply);
+    return () => media.removeEventListener("change", apply);
+  }, []);
+
+  const wheelSize = isMobileView ? "min(92vw, 360px)" : "min(78vw, 400px)";
+  const centerInset = isMobileView ? "37%" : "34%";
+  const pointerTop = isMobileView ? "4px" : "2px";
+  const labelLeft = isMobileView ? "31%" : "34%";
+  const labelTop = isMobileView ? "-16px" : "-18px";
+  const labelWidth = isMobileView ? "64%" : "58%";
+  const labelMaxWidth = isMobileView ? "112px" : "124px";
+  const labelFont = isMobileView
+    ? "clamp(8.6px, 2.15vw, 10px)"
+    : "clamp(8.6px, 1.1vw, 11px)";
+
+  const formatWheelLabel = useCallback(
+    (title: string): string => {
+      const normalized = title.replace(/\s+/g, " ").trim();
+      const words = normalized.split(" ");
+      const maxCharsPerLine = isMobileView ? 13 : 15;
+      const maxLines = 2;
+      const lines: string[] = [];
+      let current = "";
+
+      for (const word of words) {
+        const candidate = current ? `${current} ${word}` : word;
+        if (candidate.length <= maxCharsPerLine || !current) {
+          current = candidate;
+          continue;
+        }
+        lines.push(current);
+        current = word;
+        if (lines.length === maxLines - 1) {
+          break;
+        }
+      }
+
+      if (current && lines.length < maxLines) {
+        lines.push(current);
+      }
+
+      if (lines.length === 0) {
+        return normalized;
+      }
+
+      if (lines.length < maxLines) {
+        return lines.join("\n");
+      }
+
+      const usedWords = lines.join(" ").split(" ").length;
+      if (usedWords < words.length) {
+        const truncated = lines[maxLines - 1];
+        lines[maxLines - 1] =
+          truncated.length >= maxCharsPerLine
+            ? `${truncated.slice(0, maxCharsPerLine - 1)}…`
+            : `${truncated}…`;
+      }
+      return lines.join("\n");
+    },
+    [isMobileView]
+  );
 
   useEffect(() => {
     wheelTopicsRef.current = wheelTopics;
@@ -404,33 +471,34 @@ export default function StrategyCompassSection({
           style={{
             position: "relative",
             display: "flex",
+            flexDirection: "column",
             justifyContent: "center",
-            paddingTop: "14px",
+            alignItems: "center",
+            paddingTop: isMobileView ? "30px" : "26px",
           }}
         >
           <div
             aria-hidden="true"
             style={{
               position: "absolute",
-              top: 0,
+              top: pointerTop,
               left: "50%",
               transform: "translateX(-50%)",
-              width: 0,
-              height: 0,
-              borderLeft: "14px solid transparent",
-              borderRight: "14px solid transparent",
-              borderTop: "24px solid #111",
-              zIndex: 5,
-              filter: "drop-shadow(0 3px 2px rgba(0,0,0,0.25))",
+              width: "30px",
+              height: "22px",
+              background: "#111",
+              clipPath: "polygon(50% 100%, 0 0, 100% 0)",
+              zIndex: 8,
+              filter: "drop-shadow(0 2px 3px rgba(0,0,0,0.35))",
             }}
           />
 
           <div
             style={{
-              width: "min(78vw, 390px)",
+              width: wheelSize,
               aspectRatio: "1 / 1",
               borderRadius: "50%",
-              border: "8px solid #fff",
+              border: "8px solid #f8f8f8",
               background: wheelGradient,
               transform: `rotate(${rotation}deg)`,
               transition: isSpinning
@@ -441,10 +509,52 @@ export default function StrategyCompassSection({
               overflow: "hidden",
             }}
           >
+            {/* Segment labels inside wheel */}
+            {wheelTopics.map((topic, index) => {
+              const midAngle = index * segmentAngle + segmentAngle / 2;
+              return (
+                <div
+                  key={`${topic.title}-${index}`}
+                  style={{
+                    position: "absolute",
+                    top: "50%",
+                    left: "50%",
+                    width: "50%",
+                    height: "0",
+                    transformOrigin: "0 0",
+                    transform: `rotate(${midAngle - 90}deg)`,
+                    pointerEvents: "none",
+                  }}
+                >
+                  <span
+                    style={{
+                      position: "absolute",
+                      left: "30%",
+                      top: "0px",
+                      width: "60%",
+                      maxWidth: labelMaxWidth,
+                      transform: "translateY(-50%)",
+                      color: "rgba(255,255,255,0.98)",
+                      fontSize: labelFont,
+                      fontWeight: 700,
+                      lineHeight: 1.1,
+                      textAlign: "center",
+                      whiteSpace: "pre-line",
+                      letterSpacing: "0.01em",
+                      textShadow: "0 1px 2px rgba(0,0,0,0.5)",
+                      wordBreak: "break-word",
+                    }}
+                  >
+                    {formatWheelLabel(topic.title)}
+                  </span>
+                </div>
+              );
+            })}
+
             <div
               style={{
                 position: "absolute",
-                inset: "33%",
+                inset: centerInset,
                 borderRadius: "50%",
                 background: "rgba(255,255,255,0.92)",
                 border: "2px solid rgba(139,0,0,0.15)",
@@ -497,44 +607,7 @@ export default function StrategyCompassSection({
                   : "Spin Limit Reached"}
           </button>
 
-          <div
-            style={{
-              border: "1px solid #eee",
-              borderRadius: "12px",
-              padding: "10px",
-              background: "#fafafa",
-              display: "flex",
-              flexDirection: "column",
-              gap: "6px",
-            }}
-          >
-            <p style={{ fontSize: "12px", color: "#777", fontWeight: 600 }}>
-              Current Wheel Topics
-            </p>
-            {wheelTopics.map((topic, index) => (
-              <div
-                key={topic.title}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "8px",
-                  fontSize: "13px",
-                  color: "#303030",
-                }}
-              >
-                <span
-                  style={{
-                    width: "9px",
-                    height: "9px",
-                    borderRadius: "50%",
-                    background: SEGMENT_COLORS[index % SEGMENT_COLORS.length],
-                    flexShrink: 0,
-                  }}
-                />
-                <span>{topic.title}</span>
-              </div>
-            ))}
-          </div>
+
         </div>
       </div>
 

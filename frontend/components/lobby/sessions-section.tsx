@@ -95,6 +95,8 @@ export default function SessionsSection({ eventId }: { eventId: string }) {
 }
 
 function SessionCard({ session, index }: { session: SessionItem; index: number }) {
+  const [isExpanded, setIsExpanded] = useState(false);
+
   const initials = (session.speaker_name || session.title)
     .split(" ")
     .map((w) => w[0])
@@ -102,68 +104,121 @@ function SessionCard({ session, index }: { session: SessionItem; index: number }
     .slice(0, 2)
     .toUpperCase();
 
+  const handleClick = () => {
+    if (session.description) {
+      setIsExpanded(!isExpanded);
+    } else if (session.video_url) {
+      window.open(session.video_url, "_blank", "noopener,noreferrer");
+    }
+  };
+
+  const isClickable = !!(session.description || session.video_url);
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.05 }}
+      onClick={handleClick}
       style={{
         background: "#fff", borderRadius: "16px", padding: "16px",
         border: "1px solid #eee",
-        display: "flex", alignItems: "center", gap: "14px",
+        display: "flex", flexDirection: "column",
         transition: "box-shadow 0.2s",
+        cursor: isClickable ? "pointer" : "default",
       }}
     >
-      {/* Avatar */}
-      <div style={{
-        width: "48px", height: "48px", borderRadius: "14px", flexShrink: 0,
-        background: "linear-gradient(135deg, #fee2e2, #fecaca)",
-        display: "flex", alignItems: "center", justifyContent: "center",
-      }}>
+      <div style={{ display: "flex", alignItems: "center", gap: "14px", width: "100%" }}>
+        {/* Avatar */}
         <div style={{
-          width: "36px", height: "36px", borderRadius: "10px",
-          background: "linear-gradient(135deg, #8B0000, #DC143C)",
+          width: "48px", height: "48px", borderRadius: "14px", flexShrink: 0,
+          background: "linear-gradient(135deg, #fee2e2, #fecaca)",
           display: "flex", alignItems: "center", justifyContent: "center",
-          color: "#fff", fontWeight: 700, fontSize: "13px",
         }}>
-          {initials}
+          <div style={{
+            width: "36px", height: "36px", borderRadius: "10px",
+            background: "linear-gradient(135deg, #8B0000, #DC143C)",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            color: "#fff", fontWeight: 700, fontSize: "13px",
+          }}>
+            {initials}
+          </div>
+        </div>
+  
+        {/* Info */}
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <p style={{ fontWeight: 600, fontSize: "15px", color: "#111", marginBottom: "2px" }}>
+            {session.speaker_name || session.title}
+          </p>
+          <p style={{ fontSize: "13px", color: "#888", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+            {session.speaker_title || session.title}
+          </p>
+        </div>
+  
+        {/* Media Buttons */}
+        <div style={{ display: "flex", gap: "8px", flexShrink: 0 }} onClick={(e) => e.stopPropagation()}>
+          {session.audio_url && (
+            <a href={session.audio_url} target="_blank" rel="noopener noreferrer"
+              style={{
+                width: "36px", height: "36px", borderRadius: "10px",
+                background: "#f5f5f5", display: "flex", alignItems: "center", justifyContent: "center",
+                cursor: "pointer", textDecoration: "none",
+              }}>
+              <Mic style={{ width: "16px", height: "16px", color: "#DC143C" }} />
+            </a>
+          )}
+          {session.video_url && (
+            <a href={session.video_url} target="_blank" rel="noopener noreferrer"
+              style={{
+                width: "36px", height: "36px", borderRadius: "10px",
+                background: "#f5f5f5", display: "flex", alignItems: "center", justifyContent: "center",
+                cursor: "pointer", textDecoration: "none",
+              }}>
+              <Video style={{ width: "16px", height: "16px", color: "#DC143C" }} />
+            </a>
+          )}
+          <motion.div animate={{ rotate: isExpanded ? 90 : 0 }}>
+            <ChevronRight style={{ width: "18px", height: "18px", color: "#ccc", alignSelf: "center", cursor: "pointer" }} />
+          </motion.div>
         </div>
       </div>
 
-      {/* Info */}
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <p style={{ fontWeight: 600, fontSize: "15px", color: "#111", marginBottom: "2px" }}>
-          {session.speaker_name || session.title}
-        </p>
-        <p style={{ fontSize: "13px", color: "#888", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-          {session.speaker_title || session.title}
-        </p>
-      </div>
-
-      {/* Media Buttons */}
-      <div style={{ display: "flex", gap: "8px", flexShrink: 0 }}>
-        {session.audio_url && (
-          <a href={session.audio_url} target="_blank" rel="noopener noreferrer"
-            style={{
-              width: "36px", height: "36px", borderRadius: "10px",
-              background: "#f5f5f5", display: "flex", alignItems: "center", justifyContent: "center",
-              cursor: "pointer", textDecoration: "none",
+      <AnimatePresence>
+        {isExpanded && session.description && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            style={{ overflow: "hidden" }}
+          >
+            <div style={{
+              marginTop: "16px", paddingTop: "16px", borderTop: "1px dashed #eee",
+              fontSize: "14px", color: "#555", lineHeight: 1.6, whiteSpace: "pre-wrap"
             }}>
-            <Mic style={{ width: "16px", height: "16px", color: "#DC143C" }} />
-          </a>
+              {session.description}
+              
+              {session.video_url && (
+                <div style={{ marginTop: "12px" }}>
+                  <a 
+                    href={session.video_url} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    onClick={(e) => e.stopPropagation()} 
+                    style={{
+                      display: "inline-flex", alignItems: "center", gap: "6px",
+                      color: "#DC143C", fontWeight: 600, fontSize: "13px", textDecoration: "none",
+                      padding: "8px 14px", background: "#fff5f5", borderRadius: "8px"
+                    }}
+                  >
+                    <Video style={{ width: "14px", height: "14px" }} />
+                    Watch Video / Webinar Link
+                  </a>
+                </div>
+              )}
+            </div>
+          </motion.div>
         )}
-        {session.video_url && (
-          <a href={session.video_url} target="_blank" rel="noopener noreferrer"
-            style={{
-              width: "36px", height: "36px", borderRadius: "10px",
-              background: "#f5f5f5", display: "flex", alignItems: "center", justifyContent: "center",
-              cursor: "pointer", textDecoration: "none",
-            }}>
-            <Video style={{ width: "16px", height: "16px", color: "#DC143C" }} />
-          </a>
-        )}
-        <ChevronRight style={{ width: "18px", height: "18px", color: "#ccc", alignSelf: "center" }} />
-      </div>
+      </AnimatePresence>
     </motion.div>
   );
 }

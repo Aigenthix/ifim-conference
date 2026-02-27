@@ -24,6 +24,7 @@ class SessionCreate(BaseModel):
     display_order: int = 0
     audio_url: str | None = None
     video_url: str | None = None
+    description: str | None = None
 
 class SessionResponse(BaseModel):
     id: str
@@ -35,6 +36,7 @@ class SessionResponse(BaseModel):
     display_order: int
     audio_url: str | None
     video_url: str | None
+    description: str | None
     is_active: bool
     created_at: str
 
@@ -74,6 +76,7 @@ async def get_event_sessions(
                 display_order=s.display_order,
                 audio_url=s.audio_url,
                 video_url=s.video_url,
+                description=s.description,
                 is_active=s.is_active,
                 created_at=str(s.created_at),
             )
@@ -105,6 +108,7 @@ async def create_session(
         display_order=payload.display_order,
         audio_url=payload.audio_url,
         video_url=payload.video_url,
+        description=payload.description,
     )
     session.add(new_session)
     await session.commit()
@@ -120,6 +124,7 @@ async def create_session(
         display_order=new_session.display_order,
         audio_url=new_session.audio_url,
         video_url=new_session.video_url,
+        description=new_session.description,
         is_active=new_session.is_active,
         created_at=str(new_session.created_at),
     )

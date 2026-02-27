@@ -11,7 +11,7 @@ import { usePollStore } from "@/store/polls";
 import { useAuthStore } from "@/store/auth";
 
 const ROTATION_INTERVAL = 10 * 60 * 1000; // 10 minutes
-const REFETCH_INTERVAL = 5 * 1000; // 5 seconds for live updates
+const REFETCH_INTERVAL = 15 * 1000; // websocket handles instant updates; polling is safety net
 
 export default function LivePolls({ eventId }: { eventId: string }) {
   const token = useAuthStore((s) => s.token) ?? "";
@@ -27,6 +27,8 @@ export default function LivePolls({ eventId }: { eventId: string }) {
     queryFn: () => pollsApi.getEventPolls(eventId, token),
     enabled: !!eventId,
     refetchInterval: REFETCH_INTERVAL,
+    refetchIntervalInBackground: false,
+    refetchOnWindowFocus: false,
     staleTime: 2_000,
   });
 
@@ -92,11 +94,6 @@ export default function LivePolls({ eventId }: { eventId: string }) {
     };
   }, []);
 
-  // Reset index if polls change
-  useEffect(() => {
-    if (currentIndex >= polls.length && polls.length > 0) setCurrentIndex(0);
-  }, [polls.length, currentIndex]);
-
   const formatTime = (ms: number) => {
     const mins = Math.floor(ms / 60000);
     const secs = Math.floor((ms % 60000) / 1000);
@@ -122,7 +119,8 @@ export default function LivePolls({ eventId }: { eventId: string }) {
     );
   }
 
-  const currentPoll = polls[currentIndex];
+  const safeCurrentIndex = polls.length > 0 ? Math.min(currentIndex, polls.length - 1) : 0;
+  const currentPoll = polls[safeCurrentIndex];
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
@@ -148,7 +146,7 @@ export default function LivePolls({ eventId }: { eventId: string }) {
             <button onClick={() => navigate("prev")} style={{ width: "32px", height: "32px", borderRadius: "8px", border: "1px solid #eee", background: "#fff", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
               <ChevronLeft style={{ width: "16px", height: "16px", color: "#666" }} />
             </button>
-            <span style={{ fontSize: "13px", fontWeight: 600, color: "#555", minWidth: "40px", textAlign: "center" as const }}>{currentIndex + 1}/{polls.length}</span>
+            <span style={{ fontSize: "13px", fontWeight: 600, color: "#555", minWidth: "40px", textAlign: "center" as const }}>{safeCurrentIndex + 1}/{polls.length}</span>
             <button onClick={() => navigate("next")} style={{ width: "32px", height: "32px", borderRadius: "8px", border: "1px solid #eee", background: "#fff", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
               <ChevronRight style={{ width: "16px", height: "16px", color: "#666" }} />
             </button>
@@ -162,19 +160,43 @@ export default function LivePolls({ eventId }: { eventId: string }) {
         <div style={{ display: "flex", justifyContent: "center", gap: "8px" }}>
           {polls.map((_, i) => (
             <button key={i} onClick={() => navigate(i)} style={{
-              width: i === currentIndex ? "24px" : "8px", height: "8px",
-              borderRadius: "999px", border: "none", cursor: "pointer",
-              background: i === currentIndex ? "#DC143C" : "#ddd",
-              transition: "all 0.3s",
-            }} />
-          ))}
-        </div>
+                  width: i === safeCurrentIndex ? "24px" : "8px", height: "8px",
+                  borderRadius: "999px", border: "none", cursor: "pointer",
+                  background: i === safeCurrentIndex ? "#DC143C" : "#ddd",
+                  transition: "all 0.3s",
+                }} />
+              ))}
+            </div>
       )}
 
       {/* Active Poll */}
       <AnimatePresence mode="wait">
         {currentPoll && <PollCard key={currentPoll.id} poll={currentPoll} token={token} />}
       </AnimatePresence>
+
+      {/* Bottom Navigation Buttons */}
+      {polls.length > 1 && (
+        <div style={{ display: "flex", justifyContent: "center", gap: "12px", marginTop: "4px" }}>
+          <button onClick={() => navigate("prev")} style={{
+            display: "flex", alignItems: "center", gap: "8px",
+            padding: "10px 24px", borderRadius: "12px",
+            border: "1px solid #eee", background: "#fff", cursor: "pointer",
+            fontSize: "13px", fontWeight: 600, color: "#555",
+            transition: "all 0.2s",
+          }}>
+            <ChevronLeft style={{ width: "16px", height: "16px" }} /> Back
+          </button>
+          <button onClick={() => navigate("next")} style={{
+            display: "flex", alignItems: "center", gap: "8px",
+            padding: "10px 24px", borderRadius: "12px",
+            border: "none", background: "linear-gradient(135deg, #8B0000, #DC143C)", cursor: "pointer",
+            fontSize: "13px", fontWeight: 600, color: "#fff",
+            transition: "all 0.2s",
+          }}>
+            Next <ChevronRight style={{ width: "16px", height: "16px" }} />
+          </button>
+        </div>
+      )}
     </div>
   );
 }
@@ -188,6 +210,7 @@ const PollCard = memo(function PollCard({ poll, token }: { poll: import("@/lib/a
 
   const handleVote = useCallback(async (optionId: string) => {
     if (pendingOption) return; // prevent double-click while loading
+    if (voted) return; // lock answer after voting
     if (selectedOption === optionId) return; // same option, no-op
 
     setPendingOption(optionId);
@@ -270,7 +293,6 @@ const PollCard = memo(function PollCard({ poll, token }: { poll: import("@/lib/a
         <span style={{ color: "#999" }}>{totalVotes} total vote{totalVotes !== 1 ? "s" : ""}</span>
         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
           {voted && <span style={{ display: "flex", alignItems: "center", gap: "4px", color: "#22c55e", fontWeight: 500 }}><Check style={{ width: "14px", height: "14px" }} />Voted</span>}
-          {voted && <span style={{ color: "#aaa", fontSize: "11px" }}>· Tap another to change</span>}
           <span style={{ display: "flex", alignItems: "center", gap: "4px", color: "#DC143C", fontSize: "11px", fontWeight: 500 }}>
             <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#DC143C", animation: "pulse 2s infinite" }} />
             Auto-refreshing
