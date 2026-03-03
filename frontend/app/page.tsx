@@ -22,14 +22,23 @@ export default function HomePage() {
 
       {/* Main Content Wrapper */}
       <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", flex: 1, zIndex: 1 }}>
-        {/* Logo */}
-        <img src="/logo.png" alt="Bharat Synapse@2047" style={{
-          width: "200px", height: "auto", marginBottom: "28px",
-          borderRadius: "16px",
-          background: "rgba(255,255,255,0.95)",
-          padding: "12px 16px",
-          boxShadow: "0 8px 32px rgba(0,0,0,0.3)",
-        }} />
+        {/* Logos */}
+        <div style={{ display: "flex", alignItems: "center", gap: "20px", marginBottom: "28px" }}>
+          <img src="/logo.png" alt="Bharat Synapse Logo" style={{
+            height: "80px", width: "auto",
+            borderRadius: "12px",
+            background: "rgba(255,255,255,0.95)",
+            padding: "8px 16px",
+            boxShadow: "0 8px 32px rgba(0,0,0,0.3)",
+          }} />
+          <img src="/event.png" alt="Bharat Synapse Event" style={{
+            height: "80px", width: "auto",
+            borderRadius: "12px",
+            background: "rgba(255,255,255,0.95)",
+            padding: "8px 16px",
+            boxShadow: "0 8px 32px rgba(0,0,0,0.3)",
+          }} />
+        </div>
 
         <div style={{ display: "inline-flex", alignItems: "center", gap: "8px", padding: "8px 20px", borderRadius: "999px", border: "1px solid rgba(254,151,39,0.4)", background: "rgba(254,151,39,0.12)", marginBottom: "24px", fontSize: "13px", fontWeight: 600, color: "#FE9727", letterSpacing: "2px", textTransform: "uppercase" as const }}>
           <span style={{ width: "8px", height: "8px", borderRadius: "50%", background: "#4ade80", boxShadow: "0 0 8px rgba(74,222,128,0.6)" }} />

@@ -323,7 +323,10 @@ export default function LobbyPage({ params }: { params: Promise<{ slug: string }
         <nav className="topbar-nav">
           {/* Logo */}
           <div className="topbar-left">
-            <img src="/logo.png" alt="Bharat Synapse@2047" className="topbar-logo" />
+          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+            <img src="/logo.png" alt="Bharat Synapse Logo" className="topbar-logo" style={{ maxHeight: "36px", width: "auto" }} />
+            <img src="/event.png" alt="Bharat Synapse Event" className="topbar-logo" style={{ maxHeight: "36px", width: "auto" }} />
+          </div>
           </div>
 
           {/* Desktop Tabs */}

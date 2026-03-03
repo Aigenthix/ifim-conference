@@ -162,9 +162,14 @@ export default function LobbyOverview({ lobby }: { lobby: EventLobby }) {
       }}>
         <div style={{ position: "absolute", top: "-60px", right: "-60px", width: "200px", height: "200px", borderRadius: "50%", background: "rgba(255,255,255,0.06)" }} />
         <div style={{ position: "relative" }}>
-          {/* Logo — prominent with white bg */}
+          {/* Logos — prominent with white bg */}
           <div style={{ display: "flex", alignItems: "center", gap: "16px", marginBottom: "20px" }}>
-            <img src="/logo.png" alt="Bharat Synapse@2047 — IFIM School of Technology" style={{
+            <img src="/logo.png" alt="Bharat Synapse Logo" style={{
+              height: "60px", padding: "8px 12px", background: "rgba(255,255,255,0.95)",
+              borderRadius: "12px", objectFit: "contain",
+              boxShadow: "0 4px 16px rgba(0,0,0,0.15)",
+            }} />
+            <img src="/event.png" alt="Bharat Synapse Event" style={{
               height: "60px", padding: "8px 12px", background: "rgba(255,255,255,0.95)",
               borderRadius: "12px", objectFit: "contain",
               boxShadow: "0 4px 16px rgba(0,0,0,0.15)",

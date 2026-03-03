@@ -82,13 +82,14 @@ export default function RegisterPage({ params }: { params: Promise<{ slug: strin
       <div style={{ position: "absolute", bottom: "-80px", left: "-80px", width: "280px", height: "280px", borderRadius: "50%", background: "rgba(254,151,39,0.03)" }} />
 
       {/* Logo */}
-      <img src="/logo.png" alt="Bharat Synapse@2047" style={{
-        width: "200px", height: "auto", marginBottom: "24px",
-        borderRadius: "16px",
-        background: "rgba(255,255,255,0.95)",
-        padding: "10px 14px",
-        boxShadow: "0 8px 32px rgba(0,0,0,0.3)",
-      }} />
+      <div style={{ display: "flex", alignItems: "center", gap: "16px", marginBottom: "24px" }}>
+        <img src="/logo.png" alt="Bharat Synapse Logo" style={{
+          height: "64px", width: "auto", borderRadius: "12px", background: "rgba(255,255,255,0.95)", padding: "8px 12px", boxShadow: "0 8px 32px rgba(0,0,0,0.3)"
+        }} />
+        <img src="/event.png" alt="Bharat Synapse Event" style={{
+          height: "64px", width: "auto", borderRadius: "12px", background: "rgba(255,255,255,0.95)", padding: "8px 12px", boxShadow: "0 8px 32px rgba(0,0,0,0.3)"
+        }} />
+      </div>
 
       <h1 style={{ fontSize: "28px", fontWeight: 800, color: "#fff", marginBottom: "6px", textAlign: "center" }}>
         Join Bharat Synapse@2047

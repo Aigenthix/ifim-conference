@@ -169,11 +169,11 @@ function DashboardTab({ dashboard, isLoading }: { dashboard: Dashboard | undefin
   const stats = [
     { label: "Registrations", value: dashboard.total_registrations, icon: Users, color: "#3b82f6" },
     { label: "Live Users", value: dashboard.live_concurrent_users, icon: Activity, color: "#22c55e", badge: "Live" },
-    { label: "Total Votes", value: dashboard.total_votes, icon: BarChart3, color: "#a855f7" },
+    // { label: "Total Votes", value: dashboard.total_votes, icon: BarChart3, color: "#a855f7" },
     { label: "Avg Rating", value: dashboard.average_rating?.toFixed(1), icon: Star, color: "#eab308" },
     { label: "Feedback", value: dashboard.total_feedback, icon: MessageSquare, color: "#ec4899" },
-    { label: "AI Queries", value: dashboard.total_queries, icon: TrendingUp, color: "#06b6d4" },
-    { label: "Active Polls", value: dashboard.total_polls, icon: Award, color: "#f97316" },
+    // { label: "AI Queries", value: dashboard.total_queries, icon: TrendingUp, color: "#06b6d4" },
+    // { label: "Active Polls", value: dashboard.total_polls, icon: Award, color: "#f97316" },
   ];
 
   return (
@@ -199,7 +199,7 @@ function DashboardTab({ dashboard, isLoading }: { dashboard: Dashboard | undefin
         })}
       </div>
 
-      {dashboard.top_queries?.length > 0 && (
+      {/* {dashboard.top_queries?.length > 0 && (
         <div style={{ padding: "24px", borderRadius: "16px", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.06)" }}>
           <h3 style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "16px", fontSize: "16px" }}>
             <TrendingUp style={{ width: "18px", height: "18px", color: "#06b6d4" }} /> Top AI Queries
@@ -215,7 +215,7 @@ function DashboardTab({ dashboard, isLoading }: { dashboard: Dashboard | undefin
             </div>
           ))}
         </div>
-      )}
+      )} */}
     </div>
   );
 }
