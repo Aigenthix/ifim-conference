@@ -1,4 +1,4 @@
-# Event Platform
+# IFIM Event Platform
 
 A production-grade, event platform consisting of a Next.js frontend and a FastAPI backend. Designed to handle high concurrency Architecture & Tech Stack.
 
