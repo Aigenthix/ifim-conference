@@ -75,7 +75,7 @@ export default function AdminDashboard({ params }: { params: Promise<{ eventId: 
     { id: "feedback", label: "Feedback", icon: MessageSquare },
     // { id: "qa", label: "Q&A", icon: MessageCircle },
     // { id: "sessions", label: "Sessions", icon: Mic },
-    { id: "alerts", label: "Alerts", icon: Bell },
+    // { id: "alerts", label: "Alerts", icon: Bell },
     { id: "bulkemail", label: "Bulk Email", icon: Mail },
   ];
 
@@ -154,7 +154,7 @@ export default function AdminDashboard({ params }: { params: Promise<{ eventId: 
         {activeTab === "adduser" && <AddUserTab eventId={eventId} token={token} />}
         {activeTab === "feedback" && <FeedbackTab eventId={eventId} token={token} />}
         {/* {activeTab === "sessions" && <SessionsTab eventId={eventId} token={token} />} */}
-        {activeTab === "alerts" && <AlertsTab eventId={eventId} token={token} />}
+        {/* {activeTab === "alerts" && <AlertsTab eventId={eventId} token={token} />} */}
         {/* {activeTab === "qa" && <QATab eventId={eventId} token={token} />} */}
         {activeTab === "bulkemail" && <BulkEmailTab eventId={eventId} token={token} />}
       </main>
@@ -788,10 +788,8 @@ function AddUserTab({ eventId, token }: { eventId: string; token: string }) {
     { key: "name", label: "Full Name", icon: Users, required: true, placeholder: "John Doe" },
     { key: "email", label: "Email Address", icon: Mail, required: true, placeholder: "john@company.com" },
     { key: "phone", label: "Phone Number", icon: Phone, required: true, placeholder: "+91 98765 43210" },
-    { key: "company", label: "Company / Firm", icon: Building2, required: false, placeholder: "Company Name" },
-    { key: "food_preference", label: "Food Preference", icon: UtensilsCrossed, required: false, placeholder: "Veg / Non-Veg" },
-    { key: "tshirt_size", label: "T-Shirt Size", icon: Shirt, required: false, placeholder: "S / M / L / XL / XXL" },
-    { key: "growth_focus", label: "Growth Focus", icon: TrendingUp, required: false, placeholder: "e.g. Growth through Technology" },
+    { key: "company", label: "Student/Company", icon: Building2, required: false, placeholder: "Company Name" },
+    { key: "growth_focus", label: "Title of Paper", icon: TrendingUp, required: false, placeholder: "Title of Paper:.." },
   ];
 
   return (

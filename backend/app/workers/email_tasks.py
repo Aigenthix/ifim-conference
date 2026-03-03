@@ -35,15 +35,16 @@ def _build_email_body(name: str) -> str:
     return f"""\
 Dear {name},
 
-Thank you for registering for Raj Darbar 2026. We are delighted to have you join us for this special event.
+Thank you for registering for Bharat Synapse 2047. We are delighted to have you join us for this special event.
 
 Please keep your QR code ready, as it will be required for entry at the venue.
 
 Your Entry QR Code is attached to this email.
 
 Event Details:
-Event: Raj Darbar 2026
-Date: 27th & 28th February 2026
+Event: Bharat Synapse 2047
+Date: 5th & 6th March 2026
+Venue: IFIM College, Bengaluru
 
 Kindly present the above QR code at the registration desk for a smooth check-in process.
 
@@ -113,7 +114,7 @@ def send_bulk_emails(
             try:
                 # Generate QR code data with all badge fields
                 qr_data = f"""
-Event: Raj Darbar 2026
+Event: Bharat Synapse 2047
 Name: {ticket.name}
 Mobile: {ticket.phone}
 Email: {ticket.email}
@@ -127,7 +128,7 @@ Growth Focus: {ticket.growth_focus or 'N/A'}
                 msg = EmailMessage()
                 msg["From"] = sender_email
                 msg["To"] = ticket.email
-                msg["Subject"] = "Registration Confirmation \u2013 Raj Darbar 2026"
+                msg["Subject"] = "Registration Confirmation \u2013 Bharat Synapse 2047"
                 msg.set_content(_build_email_body(ticket.name))
 
                 # Attach QR code
