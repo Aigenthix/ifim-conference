@@ -15,7 +15,7 @@ const SPEAKER_IMAGES: Record<string, string> = {};
 const SPEAKER_BIOS: Record<string, string> = {};
 
 export default function LobbyOverview({ lobby }: { lobby: EventLobby }) {
-  const { userId, eventId, userName, userEmail, userPhone, userCompany, userFoodPreference, userTshirtSize, userGrowthFocus } = useAuthStore();
+  const { userId, eventId, userName, userEmail, userPhone, userGrowthFocus } = useAuthStore();
 
   // Generate QR code URL encoding user profile as vCard
   const qrCodeUrl = useMemo(() => {
@@ -26,14 +26,13 @@ export default function LobbyOverview({ lobby }: { lobby: EventLobby }) {
       `FN:${userName}`,
       userEmail ? `EMAIL:${userEmail}` : "",
       userPhone ? `TEL:${userPhone}` : "",
-      userCompany ? `ORG:${userCompany}` : "",
       userId ? `X-USER-ID:${userId}` : "",
       eventId ? `X-EVENT-ID:${eventId}` : "",
-      userFoodPreference ? `NOTE:Food: ${userFoodPreference}; T-Shirt: ${userTshirtSize || "N/A"}; Growth Focus: ${userGrowthFocus || "N/A"}` : "",
+      userGrowthFocus ? `NOTE:Title of Paper: ${userGrowthFocus}` : "",
       "END:VCARD",
     ].filter(Boolean).join("\n");
     return `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(vCard)}`;
-  }, [eventId, userId, userName, userEmail, userPhone, userCompany, userFoodPreference, userTshirtSize, userGrowthFocus]);
+  }, [eventId, userId, userName, userEmail, userPhone, userGrowthFocus]);
   const [showQr, setShowQr] = useState(false);
   const speakers = lobby.speakers as Speaker[] | null;
   const team = lobby.team as TeamMember[] | null;
@@ -141,12 +140,9 @@ export default function LobbyOverview({ lobby }: { lobby: EventLobby }) {
                 {/* Profile Details */}
                 <div style={{ flex: 1, minWidth: "200px", display: "flex", flexDirection: "column", gap: "12px" }}>
                   <ProfileRow icon="👤" label="Name" value={userName} />
-                  {userCompany && <ProfileRow icon="🏢" label="Company" value={userCompany} />}
                   {userEmail && <ProfileRow icon="📧" label="Email" value={userEmail} />}
                   {userPhone && <ProfileRow icon="📱" label="Phone" value={userPhone} />}
-                  {userFoodPreference && <ProfileRow icon="🍽️" label="Food" value={userFoodPreference} />}
-                  {userTshirtSize && <ProfileRow icon="👕" label="T-Shirt" value={userTshirtSize} />}
-                  {userGrowthFocus && <ProfileRow icon="🎯" label="Growth Focus" value={userGrowthFocus} />}
+                  {userGrowthFocus && <ProfileRow icon="📄" label="Title of Paper" value={userGrowthFocus} />}
                 </div>
               </div>
             </motion.div>

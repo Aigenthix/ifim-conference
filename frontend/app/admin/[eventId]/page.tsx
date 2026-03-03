@@ -484,7 +484,7 @@ function AttendanceTab({ eventId, token }: { eventId: string; token: string }) {
           <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13px" }}>
             <thead>
               <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.1)" }}>
-                {["#", "Name", "Email", "Phone", "Company", "Food", "T-Shirt", "Growth Focus", "Goodies"].map((h) => (
+                {["#", "Name", "Email", "Phone", "Title of Paper", "Goodies"].map((h) => (
                   <th key={h} style={{ padding: "12px 10px", textAlign: "left", color: "rgba(255,255,255,0.5)", fontWeight: 600, fontSize: "12px", textTransform: "uppercase", letterSpacing: "0.5px" }}>{h}</th>
                 ))}
               </tr>
@@ -502,9 +502,6 @@ function AttendanceTab({ eventId, token }: { eventId: string; token: string }) {
                   <td style={{ padding: "10px", fontWeight: 500 }}>{a.name}</td>
                   <td style={{ padding: "10px", color: "rgba(255,255,255,0.6)" }}>{a.email}</td>
                   <td style={{ padding: "10px", color: "rgba(255,255,255,0.6)" }}>{a.phone}</td>
-                  <td style={{ padding: "10px", color: "rgba(255,255,255,0.6)" }}>{a.company || "—"}</td>
-                  <td style={{ padding: "10px", color: "rgba(255,255,255,0.6)" }}>{a.food_preference || "—"}</td>
-                  <td style={{ padding: "10px", color: "rgba(255,255,255,0.6)" }}>{a.tshirt_size || "—"}</td>
                   <td style={{ padding: "10px", color: "rgba(255,255,255,0.6)" }}>{a.growth_focus || "—"}</td>
                   <td style={{ padding: "10px" }}>
                     <button
