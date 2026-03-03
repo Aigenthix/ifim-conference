@@ -294,42 +294,46 @@ export default function LobbyOverview({ lobby }: { lobby: EventLobby }) {
         </Section>
       )}
 
-      {/* Team */}
-      {team && team.length > 0 && (
-        <Section title="Team Behind the Event" icon={Users} delay={0.2}>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))", gap: "12px" }}>
-            {team.map((t, i) => (
-              <div key={i} style={{
-                borderRadius: "16px", padding: "20px", textAlign: "center" as const,
-                background: "#fafafa", border: "1px solid #f0f0f0",
-              }}>
-                <div style={{
-                  width: "44px", height: "44px", margin: "0 auto 10px", borderRadius: "50%",
-                  background: "linear-gradient(135deg, #FE9727, #FF6B6B)",
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                  color: "#fff", fontWeight: 700, fontSize: "16px",
-                  overflow: "hidden"
-                }}>
-                  <img
-                    src={`/team/${encodeURIComponent(t.name.toUpperCase())}.png`}
-                    alt={t.name}
-                    style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                    onError={(e) => {
-                      e.currentTarget.style.display = "none";
-                      if (e.currentTarget.nextSibling) {
-                        (e.currentTarget.nextSibling as HTMLSpanElement).style.display = "inline";
-                      }
-                    }}
-                  />
-                  <span style={{ display: "none" }}>{t.name.charAt(0)}</span>
-                </div>
-                <p style={{ fontWeight: 600, fontSize: "14px", color: "#111" }}>{t.name}</p>
-                {t.role && <p style={{ fontSize: "12px", color: "#888", marginTop: "4px" }}>{t.role}</p>}
-              </div>
-            ))}
+      {/* Panel Discussions */}
+      <Section title="Panel Discussions" icon={Users} delay={0.2}>
+        <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+          {/* Panel 1 */}
+          <div style={{ borderRadius: "16px", overflow: "hidden", border: "1px solid #eaeaea", boxShadow: "0 8px 24px rgba(0,0,0,0.06)", backgroundColor: "#fff" }}>
+            <div style={{ padding: "16px 20px", borderBottom: "1px solid #eaeaea", backgroundColor: "#fafafa" }}>
+              <div style={{ fontWeight: 700, fontSize: "16px", color: "#111", marginBottom: "4px" }}>Panel Discussion</div>
+              <div style={{ fontWeight: 600, fontSize: "14px", color: "#FE9727" }}>Topic: Role of AI in Achieving Viksit Bharat 2047 Goals</div>
+            </div>
+            <div style={{ padding: "16px 20px" }}>
+              <div style={{ fontWeight: 600, fontSize: "14px", color: "#333", marginBottom: "12px" }}>Panelists:</div>
+              <ul style={{ listStyleType: "none", paddingLeft: "0", display: "flex", flexDirection: "column", gap: "10px", margin: 0 }}>
+                <li style={{ fontSize: "14px", color: "#444", display: "flex", alignItems: "flex-start", gap: "8px" }}><span style={{ color: "#FE9727", marginTop: "-2px" }}>•</span> <span><strong>Mr. Pranav Padode</strong>, Board Member, CDE</span></li>
+                <li style={{ fontSize: "14px", color: "#444", display: "flex", alignItems: "flex-start", gap: "8px" }}><span style={{ color: "#FE9727", marginTop: "-2px" }}>•</span> <span><strong>Dr. A V Arun Kumar</strong>, Director, IFIM College</span></li>
+                <li style={{ fontSize: "14px", color: "#444", display: "flex", alignItems: "flex-start", gap: "8px" }}><span style={{ color: "#FE9727", marginTop: "-2px" }}>•</span> <span><strong>Dr. Sridevi Varanasi</strong>, Academic Dean, JAGSOM</span></li>
+                <li style={{ fontSize: "14px", color: "#444", display: "flex", alignItems: "flex-start", gap: "8px" }}><span style={{ color: "#FE9727", marginTop: "-2px" }}>•</span> <span><strong>Dr. Nilima Panchal</strong>, Prof. & Head, Dept. of Public Policy & Governance, Gujarat University</span></li>
+                <li style={{ fontSize: "14px", color: "#444", display: "flex", alignItems: "flex-start", gap: "8px" }}><span style={{ color: "#FE9727", marginTop: "-2px" }}>•</span> <span><strong>Prof. Nikil Gupta</strong>, Professor of Practice, IFIM College</span></li>
+              </ul>
+            </div>
           </div>
-        </Section>
-      )}
+
+          {/* Panel 2 */}
+          <div style={{ borderRadius: "16px", overflow: "hidden", border: "1px solid #eaeaea", boxShadow: "0 8px 24px rgba(0,0,0,0.06)", backgroundColor: "#fff" }}>
+            <div style={{ padding: "16px 20px", borderBottom: "1px solid #eaeaea", backgroundColor: "#fafafa" }}>
+              <div style={{ fontWeight: 700, fontSize: "16px", color: "#111", marginBottom: "4px" }}>Panel Discussion</div>
+              <div style={{ fontWeight: 600, fontSize: "14px", color: "#FE9727" }}>Topic: AI Enabled workforce across domains: Challenges and Opportunities</div>
+            </div>
+            <div style={{ padding: "16px 20px" }}>
+              <div style={{ fontWeight: 600, fontSize: "14px", color: "#333", marginBottom: "12px" }}>Panelists:</div>
+              <ul style={{ listStyleType: "none", paddingLeft: "0", display: "flex", flexDirection: "column", gap: "10px", margin: 0 }}>
+                <li style={{ fontSize: "14px", color: "#444", display: "flex", alignItems: "flex-start", gap: "8px" }}><span style={{ color: "#FE9727", marginTop: "-2px" }}>•</span> <span><strong>Dr. Sakkthivel A M</strong>, Principal, IFIM College</span></li>
+                <li style={{ fontSize: "14px", color: "#444", display: "flex", alignItems: "flex-start", gap: "8px" }}><span style={{ color: "#FE9727", marginTop: "-2px" }}>•</span> <span><strong>Dr. Tapan Nayak</strong>, Director, ISBR</span></li>
+                <li style={{ fontSize: "14px", color: "#444", display: "flex", alignItems: "flex-start", gap: "8px" }}><span style={{ color: "#FE9727", marginTop: "-2px" }}>•</span> <span><strong>Dr Arpit Deepak Yadav</strong>, Assistant Professor in IT and Analytics, IFIM College</span></li>
+                <li style={{ fontSize: "14px", color: "#444", display: "flex", alignItems: "flex-start", gap: "8px" }}><span style={{ color: "#FE9727", marginTop: "-2px" }}>•</span> <span><strong>Srinivas K</strong>, Finance Planning & Analysis Manager, Hewlett-Packard (HP)</span></li>
+                <li style={{ fontSize: "14px", color: "#444", display: "flex", alignItems: "flex-start", gap: "8px" }}><span style={{ color: "#FE9727", marginTop: "-2px" }}>•</span> <span><strong>Nitish Mathur</strong>, CEO, 3Cans | AI, XR & Marketing Strategist</span></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </Section>
     </div>
   );
 }
