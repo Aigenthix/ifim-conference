@@ -457,21 +457,16 @@ class ChatbotService:
         """Process a user query using Gemini with event context."""
         from app.ai.llm_client import generate_response
 
-        curated = _get_curated_bfsi_ai_answer(payload.query)
-        if curated:
-            response_text = curated
-            sources = ["curated_bfsi_ai_faq"]
-        else:
-            # Build context from event data
-            context = await self._build_event_context(payload.event_id)
+        # Build context from event data
+        context = await self._build_event_context(payload.event_id)
 
-            # Generate LLM response
-            response_text = await generate_response(
-                query=payload.query,
-                context=context,
-                history=payload.history,
-            )
-            sources = ["event_data"]
+        # Generate LLM response (always) for richer, user-specific answers.
+        response_text = await generate_response(
+            query=payload.query,
+            context=context,
+            history=payload.history,
+        )
+        sources = ["event_data"]
 
         # Store chat log
         await self._chat_repo.create(

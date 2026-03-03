@@ -472,12 +472,13 @@ function ChatPanel({ eventId, token }: { eventId: string; token: string }) {
     setLoading(true);
 
     try {
-      const curatedBeforeApi = getCuratedFaqAnswer(cleanedQuery);
-      if (curatedBeforeApi) {
+      const normalizedQuery = normalizeFaqText(cleanedQuery);
+      if (GREETINGS.some((g) => normalizedQuery === g || normalizedQuery.startsWith(g + " "))) {
+        const greetingReply = getCuratedFaqAnswer(cleanedQuery) ?? "Hello! Welcome to Bharat Synapse@2047.";
         addMessage({
           id: (Date.now() + 1).toString(),
           role: "assistant",
-          content: curatedBeforeApi,
+          content: greetingReply,
           sources: ["curated_frontend_faq"],
           timestamp: Date.now(),
         });
@@ -494,11 +495,8 @@ function ChatPanel({ eventId, token }: { eventId: string; token: string }) {
         query: cleanedQuery,
         history: historyPayload.length > 0 ? historyPayload : undefined,
       }, token);
-      
-      const curatedAfterApi = shouldUseCuratedFallback(res.response)
-        ? getCuratedFaqAnswer(cleanedQuery)
-        : null;
-      const responseText = curatedAfterApi ?? formatAssistantReply(res.response);
+
+      const responseText = formatAssistantReply(res.response);
       addMessage({ id: (Date.now() + 1).toString(), role: "assistant", content: responseText, sources: res.sources, timestamp: Date.now() });
     } catch {
       addMessage({ id: (Date.now() + 1).toString(), role: "assistant", content: "Sorry, I encountered an error. Please try again.", timestamp: Date.now() });

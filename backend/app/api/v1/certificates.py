@@ -41,8 +41,9 @@ async def download_certificate(
     event_id: uuid.UUID,
     filename: str,
     user: CurrentUser,
+    session: DBSession,
 ) -> FileResponse:
-    """Serve certificate PDF from local disk — only the owner can download."""
+    """Serve certificate PDF — regenerates using latest template, owner-only."""
     settings = get_settings()
 
     # Ensure the user can only download their own certificate
@@ -50,7 +51,18 @@ async def download_certificate(
     if filename != expected_filename:
         raise NotFoundError("You can only download your own certificate")
 
-    cert_path = Path(settings.CERTIFICATES_DIR) / str(event_id) / filename
+    # Ensure the token's active event matches requested event.
+    if user.event_id != event_id:
+        raise NotFoundError("Certificate not found")
+
+    # Always refresh PDF from the current template for existing certificate holders.
+    service = CertificateService(session=session)
+    cert_path = Path(
+        await service.regenerate_certificate_pdf(
+            user_id=user.user_id,
+            event_id=event_id,
+        )
+    )
 
     # Security: prevent path traversal
     try:

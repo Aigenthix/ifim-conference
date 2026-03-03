@@ -27,6 +27,7 @@ from app.models.user import User
 from app.workers.celery_app import celery_app
 
 logger = logging.getLogger(__name__)
+CERTIFICATE_FOOTER_TEXT = "Bharat Synapse@2047"
 
 
 @celery_app.task(
@@ -168,10 +169,10 @@ def _render_certificate_pdf(
     c.setFillColorRGB(0.3, 0.3, 0.3)
     c.drawCentredString(width / 2, height - 390, f"Date: {event_date}")
 
-    # Footer — use current event title instead of generic hardcoded text
+    # Footer text is fixed per product requirement.
     c.setFont("Helvetica-Oblique", 12)
     c.setFillColorRGB(0.5, 0.5, 0.5)
-    c.drawCentredString(width / 2, 70, event_title)
+    c.drawCentredString(width / 2, 70, CERTIFICATE_FOOTER_TEXT)
 
     c.save()
     buffer.seek(0)

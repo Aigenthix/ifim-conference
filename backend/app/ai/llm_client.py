@@ -66,13 +66,15 @@ async def generate_response(query: str, context: str, history: list[dict[str, st
     system_prompt = (
         "You are a helpful event assistant. Answer the user's question "
         "based ONLY on the provided context. If the context doesn't contain "
-        "the answer, say so politely. Be concise and helpful.\n"
+        "the answer, say so politely. Be clear, practical, and sufficiently detailed.\n"
         "Response format rules:\n"
         "- Use plain text only.\n"
         "- For short answers (1-2 lines), respond directly.\n"
         "- For detailed answers, use structured sections with line breaks and hyphen bullets.\n"
         "- Keep each bullet specific, practical, and easy to scan.\n"
-        "- Avoid large unbroken paragraphs.\n\n"
+        "- Avoid large unbroken paragraphs.\n"
+        "- Default target length: 120-200 words.\n"
+        "- If the user explicitly asks for a short/brief answer, keep it under 80 words.\n\n"
         f"Context:\n{context}{history_text}"
     )
 
@@ -90,7 +92,7 @@ async def generate_response(query: str, context: str, history: list[dict[str, st
                 ],
                 "generationConfig": {
                     "temperature": 0.3,
-                    "maxOutputTokens": 500,
+                    "maxOutputTokens": 700,
                 },
             },
             timeout=30.0,
