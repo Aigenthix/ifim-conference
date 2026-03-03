@@ -217,8 +217,22 @@ export default function LobbyOverview({ lobby }: { lobby: EventLobby }) {
       <Section title="Conference Paper Presentation Details" icon={Calendar} delay={0.08}>
         <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
           <div style={{ borderRadius: "16px", overflow: "hidden", border: "1px solid #eee", boxShadow: "0 4px 16px rgba(0,0,0,0.05)" }}>
-            <div style={{ padding: "12px 16px", background: "#fafafa", borderBottom: "1px solid #eee", fontWeight: 600, fontSize: "14px", color: "#333" }}>
-              Bharat Synapse@2047 - Presentation Details
+            <div style={{ padding: "12px 16px", background: "#fafafa", borderBottom: "1px solid #eee", fontWeight: 600, fontSize: "14px", color: "#333", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+              <span>Bharat Synapse@2047 - Presentation Details</span>
+              <a
+                href="/conference-paper-1.pdf"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  display: "inline-flex", alignItems: "center", gap: "6px",
+                  padding: "6px 14px", borderRadius: "8px",
+                  background: "#FE9727", color: "#fff",
+                  fontSize: "12px", fontWeight: 600,
+                  textDecoration: "none", whiteSpace: "nowrap",
+                }}
+              >
+                View / Download PDF ›
+              </a>
             </div>
             <iframe
               src="/conference-paper-1.pdf"
@@ -228,8 +242,22 @@ export default function LobbyOverview({ lobby }: { lobby: EventLobby }) {
           </div>
 
           <div style={{ borderRadius: "16px", overflow: "hidden", border: "1px solid #eee", boxShadow: "0 4px 16px rgba(0,0,0,0.05)" }}>
-            <div style={{ padding: "12px 16px", background: "#fafafa", borderBottom: "1px solid #eee", fontWeight: 600, fontSize: "14px", color: "#333" }}>
-              Bharat Synapse Paper Schedule (Final)
+            <div style={{ padding: "12px 16px", background: "#fafafa", borderBottom: "1px solid #eee", fontWeight: 600, fontSize: "14px", color: "#333", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+              <span>Bharat Synapse Paper Schedule (Final)</span>
+              <a
+                href="/conference-paper-2.pdf"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  display: "inline-flex", alignItems: "center", gap: "6px",
+                  padding: "6px 14px", borderRadius: "8px",
+                  background: "#FE9727", color: "#fff",
+                  fontSize: "12px", fontWeight: 600,
+                  textDecoration: "none", whiteSpace: "nowrap",
+                }}
+              >
+                View / Download PDF ›
+              </a>
             </div>
             <iframe
               src="/conference-paper-2.pdf"

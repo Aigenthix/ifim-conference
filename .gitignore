@@ -4,6 +4,7 @@
 *.csv
 *.xlsx
 *.pdf
+!frontend/public/*.pdf
 *.jpeg
 *.jpg
 old cetrificates/
@@ -15,3 +16,4 @@ node_modules/
 .next/
 venv/
 __pycache__/
+conference.pem
