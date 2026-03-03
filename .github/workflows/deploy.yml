@@ -9,6 +9,11 @@ jobs:
   deploy:
     runs-on: self-hosted
     steps:
+      - name: Fix runner workspace permissions
+        run: |
+          sudo mkdir -p "$GITHUB_WORKSPACE"
+          sudo chown -R "$USER:$USER" "$GITHUB_WORKSPACE" || true
+
       - name: Checkout code
         uses: actions/checkout@v4
 
