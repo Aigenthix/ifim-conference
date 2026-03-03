@@ -25,6 +25,7 @@ class Session(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     video_url: Mapped[str | None] = mapped_column(Text, nullable=True)
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    qa_protected: Mapped[bool] = mapped_column(Boolean, default=False, server_default="false", nullable=False)
 
     # Relationships
     event = relationship("Event", back_populates="sessions", lazy="joined")

@@ -39,7 +39,7 @@ export default function AdminLoginPage() {
     <div style={{
       minHeight: "100dvh",
       display: "flex", alignItems: "center", justifyContent: "center",
-      background: "linear-gradient(135deg, #1a0000, #3d0000, #1a0000)",
+      background: "linear-gradient(135deg, #1a1040, #2d1b69, #1a1040)",
       fontFamily: "'Inter', -apple-system, sans-serif",
     }}>
       <motion.div
@@ -58,7 +58,7 @@ export default function AdminLoginPage() {
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", marginBottom: "32px" }}>
           <div style={{
             width: "56px", height: "56px", borderRadius: "16px",
-            background: "linear-gradient(135deg, #8B0000, #DC143C)",
+            background: "#FE9727",
             display: "flex", alignItems: "center", justifyContent: "center",
             marginBottom: "16px",
             boxShadow: "0 8px 24px rgba(220,20,60,0.4)",
@@ -122,7 +122,7 @@ export default function AdminLoginPage() {
 
           <button type="submit" disabled={loading} style={{
             padding: "14px", borderRadius: "14px", border: "none", cursor: loading ? "not-allowed" : "pointer",
-            background: "linear-gradient(135deg, #8B0000, #DC143C)",
+            background: "#FE9727",
             color: "#fff", fontSize: "15px", fontWeight: 600,
             opacity: loading ? 0.6 : 1, transition: "opacity 0.15s",
             boxShadow: "0 8px 24px rgba(220,20,60,0.3)",

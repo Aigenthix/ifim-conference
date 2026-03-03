@@ -2,7 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
-import { ImageIcon, Download, ExternalLink } from "lucide-react";
+import { ImageIcon, Download, Loader2, Check } from "lucide-react";
 import { galleryApi } from "@/lib/api";
 import { useAuthStore } from "@/store/auth";
 import { useState } from "react";
@@ -20,12 +20,50 @@ type DrivePhoto = {
 export default function GallerySection({ eventId }: { eventId: string }) {
   const token = useAuthStore((s) => s.token) ?? "";
   const [selected, setSelected] = useState<DrivePhoto | null>(null);
+  const [downloadState, setDownloadState] = useState<"idle" | "loading" | "done">("idle");
 
   const { data: photos, isLoading } = useQuery({
     queryKey: ["gallery", eventId],
     queryFn: () => galleryApi.listPhotos(eventId, token),
     staleTime: 60_000,
   });
+
+  const handleDownload = async (photo: DrivePhoto) => {
+    if (downloadState === "loading") return;
+    setDownloadState("loading");
+
+    try {
+      // Extract file_id from download_url
+      const match = photo.download_url.match(/id=([^&]+)/);
+      const fileId = match?.[1];
+      if (!fileId) throw new Error("No file ID");
+
+      // Use our server proxy to avoid CORS
+      const proxyUrl = `/api/v1/gallery/download/${fileId}`;
+      const resp = await fetch(proxyUrl, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (!resp.ok) throw new Error("Download failed");
+
+      const blob = await resp.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = photo.filename || "photo.jpg";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      setDownloadState("done");
+      setTimeout(() => setDownloadState("idle"), 2000);
+    } catch {
+      // Final fallback: navigate in same tab
+      window.location.href = photo.download_url;
+      setTimeout(() => setDownloadState("idle"), 3000);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -54,7 +92,7 @@ export default function GallerySection({ eventId }: { eventId: string }) {
     <>
       <div style={{ borderRadius: "20px", background: "#fff", border: "1px solid #eee", padding: "28px", boxShadow: "0 2px 12px rgba(0,0,0,0.04)" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "20px" }}>
-          <div style={{ width: "36px", height: "36px", borderRadius: "10px", background: "linear-gradient(135deg, #8B0000, #DC143C)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <div style={{ width: "36px", height: "36px", borderRadius: "10px", background: "#FE9727", display: "flex", alignItems: "center", justifyContent: "center" }}>
             <ImageIcon style={{ width: "18px", height: "18px", color: "#fff" }} />
           </div>
           <h2 style={{ fontSize: "20px", fontWeight: 700, color: "#111" }}>Photo Gallery</h2>
@@ -68,7 +106,7 @@ export default function GallerySection({ eventId }: { eventId: string }) {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: i * 0.05 }}
-              onClick={() => setSelected(photo)}
+              onClick={() => { setSelected(photo); setDownloadState("idle"); }}
               style={{ position: "relative", borderRadius: "14px", overflow: "hidden", aspectRatio: "4/3", background: "#f0f0f0", cursor: "pointer" }}
             >
               <img
@@ -119,20 +157,36 @@ export default function GallerySection({ eventId }: { eventId: string }) {
             />
             <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "12px", marginTop: "16px" }}>
               <span style={{ fontSize: "14px", color: "rgba(255,255,255,0.7)" }}>{selected.filename}</span>
-              <a
-                href={selected.download_url}
-                target="_blank"
-                rel="noopener noreferrer"
+              <button
+                disabled={downloadState === "loading"}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleDownload(selected);
+                }}
                 style={{
                   display: "inline-flex", alignItems: "center", gap: "6px",
                   padding: "10px 20px", borderRadius: "12px",
-                  background: "linear-gradient(135deg, #8B0000, #DC143C)",
+                  background: downloadState === "done"
+                    ? "linear-gradient(135deg, #15803d, #22c55e)"
+                    : "#FE9727",
                   color: "#fff", fontSize: "13px", fontWeight: 600,
-                  textDecoration: "none",
+                  border: "none",
+                  cursor: downloadState === "loading" ? "wait" : "pointer",
+                  opacity: downloadState === "loading" ? 0.7 : 1,
+                  transition: "all 0.3s ease",
+                  minWidth: "140px", justifyContent: "center",
                 }}
               >
-                <Download style={{ width: "14px", height: "14px" }} /> Download
-              </a>
+                {downloadState === "loading" && (
+                  <><Loader2 style={{ width: "14px", height: "14px", animation: "spin 1s linear infinite" }} /> Downloading...</>
+                )}
+                {downloadState === "done" && (
+                  <><Check style={{ width: "14px", height: "14px" }} /> Downloaded ✓</>
+                )}
+                {downloadState === "idle" && (
+                  <><Download style={{ width: "14px", height: "14px" }} /> Download</>
+                )}
+              </button>
             </div>
           </motion.div>
           <button
@@ -147,6 +201,7 @@ export default function GallerySection({ eventId }: { eventId: string }) {
           >✕</button>
         </div>
       )}
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
     </>
   );
 }

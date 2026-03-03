@@ -99,9 +99,9 @@ const SEGMENT_COUNT = 8;
 const MAX_SPINS = 3;
 const SPIN_DURATION_MS = 4600;
 const SEGMENT_COLORS = [
-  "#8B0000",
-  "#B22222",
-  "#DC143C",
+  "#000000",
+  "#FE9727",
+  "#FE9727",
   "#C0392B",
   "#E67E22",
   "#A93226",
@@ -446,7 +446,7 @@ export default function StrategyCompassSection({
       >
         <h2
           style={{
-            color: "#8B0000",
+            color: "#000000",
             fontSize: "24px",
             fontWeight: 800,
             letterSpacing: "-0.3px",
@@ -563,7 +563,7 @@ export default function StrategyCompassSection({
                 justifyContent: "center",
                 fontSize: "12px",
                 fontWeight: 700,
-                color: "#8B0000",
+                color: "#000000",
                 textAlign: "center",
                 padding: "10px",
                 lineHeight: 1.3,
@@ -592,7 +592,7 @@ export default function StrategyCompassSection({
               fontSize: "14px",
               fontWeight: 700,
               color: "#fff",
-              background: canSpin ? "linear-gradient(135deg, #8B0000, #DC143C)" : "#bfbfbf",
+              background: canSpin ? "#FE9727" : "#bfbfbf",
               cursor: canSpin ? "pointer" : "not-allowed",
               boxShadow: canSpin ? "0 8px 14px rgba(139,0,0,0.2)" : "none",
               transition: "all 0.2s ease",
@@ -640,7 +640,7 @@ export default function StrategyCompassSection({
               gap: "12px",
             }}
           >
-            <p style={{ fontSize: "12px", color: "#8B0000", fontWeight: 700, letterSpacing: "0.06em" }}>
+            <p style={{ fontSize: "12px", color: "#000000", fontWeight: 700, letterSpacing: "0.06em" }}>
               SELECTED TOPIC
             </p>
             <h3 style={{ fontSize: "24px", color: "#111", lineHeight: 1.25 }}>{selectedTopic.title}</h3>
@@ -648,7 +648,7 @@ export default function StrategyCompassSection({
 
             <div style={{ borderTop: "1px solid #eee", paddingTop: "10px", display: "flex", flexDirection: "column", gap: "10px" }}>
               <div>
-                <p style={{ fontSize: "12px", color: "#8B0000", fontWeight: 700, letterSpacing: "0.05em", marginBottom: "4px" }}>
+                <p style={{ fontSize: "12px", color: "#000000", fontWeight: 700, letterSpacing: "0.05em", marginBottom: "4px" }}>
                   HOW IT WORKS
                 </p>
                 <p style={{ color: "#333", fontSize: "14px", lineHeight: 1.65 }}>
@@ -657,7 +657,7 @@ export default function StrategyCompassSection({
               </div>
 
               <div>
-                <p style={{ fontSize: "12px", color: "#8B0000", fontWeight: 700, letterSpacing: "0.05em", marginBottom: "4px" }}>
+                <p style={{ fontSize: "12px", color: "#000000", fontWeight: 700, letterSpacing: "0.05em", marginBottom: "4px" }}>
                   BUSINESS IMPACT
                 </p>
                 <p style={{ color: "#333", fontSize: "14px", lineHeight: 1.65 }}>
@@ -666,7 +666,7 @@ export default function StrategyCompassSection({
               </div>
 
               <div>
-                <p style={{ fontSize: "12px", color: "#8B0000", fontWeight: 700, letterSpacing: "0.05em", marginBottom: "4px" }}>
+                <p style={{ fontSize: "12px", color: "#000000", fontWeight: 700, letterSpacing: "0.05em", marginBottom: "4px" }}>
                   IMPLEMENTATION PLAYBOOK
                 </p>
                 <ol style={{ margin: 0, paddingLeft: "18px", color: "#333", fontSize: "14px", lineHeight: 1.65 }}>
@@ -677,7 +677,7 @@ export default function StrategyCompassSection({
               </div>
 
               <div>
-                <p style={{ fontSize: "12px", color: "#8B0000", fontWeight: 700, letterSpacing: "0.05em", marginBottom: "6px" }}>
+                <p style={{ fontSize: "12px", color: "#000000", fontWeight: 700, letterSpacing: "0.05em", marginBottom: "6px" }}>
                   KPIS TO TRACK
                 </p>
                 <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
@@ -712,7 +712,7 @@ export default function StrategyCompassSection({
                   fontSize: "13px",
                   fontWeight: 700,
                   color: "#fff",
-                  background: "#8B0000",
+                  background: "#000000",
                   cursor: "pointer",
                 }}
               >

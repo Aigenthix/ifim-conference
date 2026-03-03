@@ -94,7 +94,7 @@ export default function AdminDashboard({ params }: { params: Promise<{ eventId: 
           <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
             <div style={{
               width: "32px", height: "32px", borderRadius: "8px",
-              background: "linear-gradient(135deg, #8B0000, #DC143C)",
+              background: "#FE9727",
               display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
             }}>
               <Zap style={{ width: "16px", height: "16px", color: "#fff" }} />
@@ -956,7 +956,6 @@ function SessionsTab({ eventId, token }: { eventId: string; token: string }) {
               { key: "title", label: "Title", ph: "Session title" },
               { key: "speaker_name", label: "Speaker Name (Optional)", ph: "Speaker name" },
               { key: "speaker_title", label: "Speaker Title (Optional)", ph: "CEO, Founder..." },
-              { key: "description", label: "Description (Optional)", ph: "Information about the session..." },
               { key: "video_url", label: "Video URL (Optional)", ph: "https://youtube.com/..." },
               { key: "day", label: "Day", ph: "1" },
             ].map((f) => (
@@ -970,6 +969,16 @@ function SessionsTab({ eventId, token }: { eventId: string; token: string }) {
                 />
               </div>
             ))}
+          </div>
+          <div>
+            <label style={{ fontSize: "12px", fontWeight: 600, color: "rgba(255,255,255,0.5)", marginBottom: "4px", display: "block" }}>Description (Optional)</label>
+            <textarea
+              placeholder="Information about the session... (supports line breaks and bullet points)"
+              value={form.description}
+              onChange={(e) => setForm({ ...form, description: e.target.value })}
+              rows={6}
+              style={{ width: "100%", padding: "10px 14px", borderRadius: "8px", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", color: "#fff", fontSize: "14px", outline: "none", resize: "vertical", fontFamily: "inherit", lineHeight: "1.6" }}
+            />
           </div>
           <button type="submit" style={{
             padding: "12px", borderRadius: "10px", border: "none", cursor: "pointer",
@@ -1144,8 +1153,8 @@ const FALLBACK_QA_SESSIONS: QASessionItem[] = [
   },
   {
     id: "fallback-day2-3",
-    title: "Book Journey: The Ideal Entrepreneur",
-    speaker_name: "Rahul Agrawal",
+    title: "Book Journey - The Ideal Entrepreneur",
+    speaker_name: "Rahul Agarwal",
     day: "Day 2",
     day_number: 2,
     time_range: "12:15 – 01:00 PM",
@@ -1153,21 +1162,30 @@ const FALLBACK_QA_SESSIONS: QASessionItem[] = [
   },
   {
     id: "fallback-day2-4",
+    title: "The Powerful Comeback",
+    speaker_name: "Hitesh Mali",
+    day: "Day 2",
+    day_number: 2,
+    time_range: "02:15 – 02:30 PM",
+    display_order: 4,
+  },
+  {
+    id: "fallback-day2-5",
     title: "Succession Plan for Financial Distributors",
     speaker_name: "Jatin Popat",
     day: "Day 2",
     day_number: 2,
     time_range: "02:30 – 03:15 PM",
-    display_order: 4,
+    display_order: 5,
   },
   {
-    id: "fallback-day2-5",
+    id: "fallback-day2-6",
     title: "From Insight to Action",
     speaker_name: "Hitesh Mali",
     day: "Day 2",
     day_number: 2,
     time_range: "03:45 – 04:45 PM",
-    display_order: 5,
+    display_order: 6,
   },
 ];
 
@@ -1484,7 +1502,7 @@ function QATab({ eventId, token }: { eventId: string; token: string }) {
               width: "42px",
               height: "42px",
               borderRadius: "12px",
-              background: "linear-gradient(135deg, #8B0000, #DC143C)",
+              background: "#FE9727",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -1581,7 +1599,7 @@ function QATab({ eventId, token }: { eventId: string; token: string }) {
                 onClick={() => setActiveDay(day)}
                 style={{
                   borderColor: isActive ? "#de3755" : "rgba(255,255,255,0.1)",
-                  background: isActive ? "linear-gradient(135deg, #8B0000, #DC143C)" : "rgba(255,255,255,0.02)",
+                  background: isActive ? "#FE9727" : "rgba(255,255,255,0.02)",
                   color: isActive ? "#fff" : "rgba(255,255,255,0.6)",
                 }}
               >
@@ -1704,9 +1722,9 @@ function QATab({ eventId, token }: { eventId: string; token: string }) {
               }}
             >
               <div style={{ display: "flex", alignItems: "center", gap: "8px", color: "rgba(255,255,255,0.5)", fontSize: "12px" }}>
-                <Sparkles style={{ width: "14px", height: "14px", color: "#DC143C" }} />
+                <Sparkles style={{ width: "14px", height: "14px", color: "#FE9727" }} />
                 <span>
-                  Asking as <strong style={{ color: "#DC143C" }}>{userName}</strong>
+                  Asking as <strong style={{ color: "#FE9727" }}>{userName}</strong>
                   {selectedSession ? ` · ${selectedSession.time_range} · ${selectedSession.title}` : ""}
                 </span>
               </div>
@@ -1737,7 +1755,7 @@ function QATab({ eventId, token }: { eventId: string; token: string }) {
               borderRadius: "12px",
               padding: "0 16px",
               cursor: canAsk ? "pointer" : "not-allowed",
-              background: canAsk ? "linear-gradient(135deg, #8B0000, #DC143C)" : "rgba(255,255,255,0.05)",
+              background: canAsk ? "#FE9727" : "rgba(255,255,255,0.05)",
               color: canAsk ? "#fff" : "rgba(255,255,255,0.3)",
               fontSize: "14px",
               fontWeight: 800,
@@ -1848,7 +1866,7 @@ function QATab({ eventId, token }: { eventId: string; token: string }) {
                   }}
                 >
                   <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
-                    <span style={{ fontWeight: 700, fontSize: "13px", color: "#DC143C" }}>{question.user_name}</span>
+                    <span style={{ fontWeight: 700, fontSize: "13px", color: "#FE9727" }}>{question.user_name}</span>
                     <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.4)" }}>
                       <Clock3 style={{ width: "11px", height: "11px", display: "inline-block", marginRight: "4px", transform: "translateY(1px)" }} />
                       {formatTimestamp(question.created_at)} ({getRelativeTime(question.created_at)})
@@ -2027,7 +2045,7 @@ function FoodAttendanceTab({ eventId, token }: { eventId: string; token: string 
       {/* Stats */}
       <div style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}>
         <div style={{ padding: "16px 24px", borderRadius: "16px", background: "rgba(139,0,0,0.15)", border: "1px solid rgba(220,20,60,0.2)" }}>
-          <span style={{ fontSize: "24px", fontWeight: 700, color: "#DC143C" }}>{foodData?.total || 0}</span>
+          <span style={{ fontSize: "24px", fontWeight: 700, color: "#FE9727" }}>{foodData?.total || 0}</span>
           <span style={{ fontSize: "13px", color: "rgba(255,255,255,0.5)", marginLeft: "8px" }}>Total Registered</span>
         </div>
         <div style={{ padding: "16px 24px", borderRadius: "16px", background: "rgba(34,197,94,0.1)", border: "1px solid rgba(34,197,94,0.2)" }}>
@@ -2348,7 +2366,7 @@ function BulkEmailTab({ eventId, token }: { eventId: string; token: string }) {
       <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
         <div style={{
           width: "40px", height: "40px", borderRadius: "12px",
-          background: "linear-gradient(135deg, #8B0000, #DC143C)",
+          background: "#FE9727",
           display: "flex", alignItems: "center", justifyContent: "center",
         }}>
           <Mail style={{ width: "20px", height: "20px", color: "#fff" }} />
@@ -2367,7 +2385,7 @@ function BulkEmailTab({ eventId, token }: { eventId: string; token: string }) {
         background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)",
       }}>
         <h3 style={{ fontSize: "14px", fontWeight: 600, marginBottom: "16px", display: "flex", alignItems: "center", gap: "8px" }}>
-          <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#DC143C" }} />
+          <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#FE9727" }} />
           Email Configuration
         </h3>
 
@@ -2391,7 +2409,7 @@ function BulkEmailTab({ eventId, token }: { eventId: string; token: string }) {
         background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)",
       }}>
         <h3 style={{ fontSize: "14px", fontWeight: 600, marginBottom: "16px", display: "flex", alignItems: "center", gap: "8px" }}>
-          <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#DC143C" }} />
+          <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#FE9727" }} />
           Upload Visitor File
         </h3>
 
@@ -2452,7 +2470,7 @@ function BulkEmailTab({ eventId, token }: { eventId: string; token: string }) {
         <button onClick={handleUpload} disabled={uploading || !file} style={{
           marginTop: "16px", padding: "12px 24px", borderRadius: "12px",
           border: "none", cursor: uploading ? "wait" : "pointer",
-          background: !file ? "rgba(255,255,255,0.06)" : "linear-gradient(135deg, #8B0000, #DC143C)",
+          background: !file ? "rgba(255,255,255,0.06)" : "#FE9727",
           color: "#fff", fontWeight: 600, fontSize: "14px", width: "100%",
           display: "flex", alignItems: "center", justifyContent: "center", gap: "8px",
           opacity: !file ? 0.4 : 1, transition: "all 0.2s",
@@ -2485,7 +2503,7 @@ function BulkEmailTab({ eventId, token }: { eventId: string; token: string }) {
         background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)",
       }}>
         <h3 style={{ fontSize: "14px", fontWeight: 600, marginBottom: "12px", display: "flex", alignItems: "center", gap: "8px" }}>
-          <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#DC143C" }} />
+          <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#FE9727" }} />
           Scan Ticket
         </h3>
         <div style={{ display: "flex", gap: "8px" }}>
@@ -2495,7 +2513,7 @@ function BulkEmailTab({ eventId, token }: { eventId: string; token: string }) {
             style={{ ...inputStyle, flex: 1 }} />
           <button onClick={handleScan} style={{
             padding: "10px 20px", borderRadius: "10px", border: "none", cursor: "pointer",
-            background: "linear-gradient(135deg, #8B0000, #DC143C)", color: "#fff",
+            background: "#FE9727", color: "#fff",
             fontWeight: 600, fontSize: "13px", whiteSpace: "nowrap",
           }}>
             <QrCode style={{ width: "14px", height: "14px" }} /> Scan
@@ -2529,7 +2547,7 @@ function BulkEmailTab({ eventId, token }: { eventId: string; token: string }) {
       }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "16px" }}>
           <h3 style={{ fontSize: "14px", fontWeight: 600, margin: 0, display: "flex", alignItems: "center", gap: "8px" }}>
-            <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#DC143C" }} />
+            <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#FE9727" }} />
             Ticket History
           </h3>
           <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
@@ -2582,7 +2600,7 @@ function BulkEmailTab({ eventId, token }: { eventId: string; token: string }) {
                     <td style={{ padding: "10px 12px", borderBottom: "1px solid rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.7)" }}>{t.email}</td>
                     <td style={{ padding: "10px 12px", borderBottom: "1px solid rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.7)" }}>{t.phone}</td>
                     <td style={{ padding: "10px 12px", borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
-                      <code style={{ background: "rgba(255,255,255,0.06)", padding: "3px 8px", borderRadius: "6px", fontSize: "11px", color: "#DC143C", fontWeight: 600 }}>
+                      <code style={{ background: "rgba(255,255,255,0.06)", padding: "3px 8px", borderRadius: "6px", fontSize: "11px", color: "#FE9727", fontWeight: 600 }}>
                         {t.ticket_id}
                       </code>
                     </td>

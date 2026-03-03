@@ -42,7 +42,7 @@ export default function AlertsSection({ eventId }: { eventId: string }) {
   if (isLoading) {
     return (
       <div style={{ display: "flex", justifyContent: "center", padding: "60px 0" }}>
-        <div style={{ width: "32px", height: "32px", border: "3px solid #eee", borderTopColor: "#DC143C", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
+        <div style={{ width: "32px", height: "32px", border: "3px solid #eee", borderTopColor: "#FE9727", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
         <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
       </div>
     );
@@ -58,7 +58,7 @@ export default function AlertsSection({ eventId }: { eventId: string }) {
             background: "linear-gradient(135deg, #fee2e2, #fecaca)",
             display: "flex", alignItems: "center", justifyContent: "center",
           }}>
-            <Bell style={{ width: "20px", height: "20px", color: "#DC143C" }} />
+            <Bell style={{ width: "20px", height: "20px", color: "#FE9727" }} />
           </div>
           <h2 style={{ fontSize: "22px", fontWeight: 700, color: "#111" }}>Notifications</h2>
         </div>
@@ -103,7 +103,7 @@ function AlertCard({ alert, index, isLatest }: { alert: AlertItem; index: number
       {/* Icon */}
       <div style={{
         width: "40px", height: "40px", borderRadius: "12px", flexShrink: 0,
-        background: isLatest ? "linear-gradient(135deg, #8B0000, #DC143C)" : "#f5f5f5",
+        background: isLatest ? "#FE9727" : "#f5f5f5",
         display: "flex", alignItems: "center", justifyContent: "center",
       }}>
         <Bell style={{

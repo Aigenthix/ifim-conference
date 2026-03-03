@@ -44,8 +44,8 @@ const FALLBACK_QA_SESSIONS: QASessionItem[] = [
   },
   {
     id: "fallback-day2-3",
-    title: "Book Journey: The Ideal Entrepreneur",
-    speaker_name: "Rahul Agrawal",
+    title: "Book Journey - The Ideal Entrepreneur",
+    speaker_name: "Rahul Agarwal",
     day: "Day 2",
     day_number: 2,
     time_range: "12:15 – 01:00 PM",
@@ -53,21 +53,30 @@ const FALLBACK_QA_SESSIONS: QASessionItem[] = [
   },
   {
     id: "fallback-day2-4",
+    title: "The Powerful Comeback",
+    speaker_name: "Hitesh Mali",
+    day: "Day 2",
+    day_number: 2,
+    time_range: "02:15 – 02:30 PM",
+    display_order: 4,
+  },
+  {
+    id: "fallback-day2-5",
     title: "Succession Plan for Financial Distributors",
     speaker_name: "Jatin Popat",
     day: "Day 2",
     day_number: 2,
     time_range: "02:30 – 03:15 PM",
-    display_order: 4,
+    display_order: 5,
   },
   {
-    id: "fallback-day2-5",
+    id: "fallback-day2-6",
     title: "From Insight to Action",
     speaker_name: "Hitesh Mali",
     day: "Day 2",
     day_number: 2,
     time_range: "03:45 – 04:45 PM",
-    display_order: 5,
+    display_order: 6,
   },
 ];
 
@@ -386,7 +395,7 @@ export default function QASection({ eventId }: { eventId: string }) {
               width: "42px",
               height: "42px",
               borderRadius: "12px",
-              background: "linear-gradient(135deg, #8B0000, #DC143C)",
+              background: "#FE9727",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -442,7 +451,7 @@ export default function QASection({ eventId }: { eventId: string }) {
               padding: "6px 12px",
               background: "#fff5f5",
               fontSize: "12px",
-              color: "#8B0000",
+              color: "#000000",
               fontWeight: 700,
               display: "inline-flex",
               alignItems: "center",
@@ -483,7 +492,7 @@ export default function QASection({ eventId }: { eventId: string }) {
                 onClick={() => setActiveDay(day)}
                 style={{
                   borderColor: isActive ? "#de3755" : "#ececec",
-                  background: isActive ? "linear-gradient(135deg, #8B0000, #DC143C)" : "#fff",
+                  background: isActive ? "#FE9727" : "#fff",
                   color: isActive ? "#fff" : "#444",
                 }}
               >
@@ -606,9 +615,9 @@ export default function QASection({ eventId }: { eventId: string }) {
               }}
             >
               <div style={{ display: "flex", alignItems: "center", gap: "8px", color: "#666", fontSize: "12px" }}>
-                <Sparkles style={{ width: "14px", height: "14px", color: "#8B0000" }} />
+                <Sparkles style={{ width: "14px", height: "14px", color: "#000000" }} />
                 <span>
-                  Asking as <strong style={{ color: "#8B0000" }}>{userName}</strong>
+                  Asking as <strong style={{ color: "#000000" }}>{userName}</strong>
                   {selectedSession ? ` · ${selectedSession.time_range} · ${selectedSession.title}` : ""}
                 </span>
               </div>
@@ -639,7 +648,7 @@ export default function QASection({ eventId }: { eventId: string }) {
               borderRadius: "12px",
               padding: "0 16px",
               cursor: canAsk ? "pointer" : "not-allowed",
-              background: canAsk ? "linear-gradient(135deg, #8B0000, #DC143C)" : "#e6e6e6",
+              background: canAsk ? "#FE9727" : "#e6e6e6",
               color: canAsk ? "#fff" : "#9a9a9a",
               fontSize: "14px",
               fontWeight: 800,
@@ -750,7 +759,7 @@ export default function QASection({ eventId }: { eventId: string }) {
                   }}
                 >
                   <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
-                    <span style={{ fontWeight: 700, fontSize: "13px", color: "#8B0000" }}>{question.user_name}</span>
+                    <span style={{ fontWeight: 700, fontSize: "13px", color: "#000000" }}>{question.user_name}</span>
                     <span style={{ fontSize: "11px", color: "#7d7d7d" }}>
                       <Clock3 style={{ width: "11px", height: "11px", display: "inline-block", marginRight: "4px", transform: "translateY(1px)" }} />
                       {formatTimestamp(question.created_at)} ({getRelativeTime(question.created_at)})

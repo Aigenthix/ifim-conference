@@ -73,28 +73,28 @@ export default function RegisterPage({ params }: { params: Promise<{ slug: strin
     <main style={{
       minHeight: "100dvh", display: "flex", flexDirection: "column",
       alignItems: "center", justifyContent: "center", padding: "24px",
-      background: "linear-gradient(165deg, #8B0000 0%, #DC143C 40%, #B22222 70%, #8B0000 100%)",
+      background: "linear-gradient(165deg, #1a1040 0%, #2d1b69 40%, #1a1040 100%)",
       fontFamily: "'Inter', -apple-system, sans-serif",
       position: "relative", overflow: "hidden",
     }}>
       {/* Decorative circles */}
-      <div style={{ position: "absolute", top: "-100px", right: "-100px", width: "350px", height: "350px", borderRadius: "50%", background: "rgba(255,255,255,0.02)" }} />
-      <div style={{ position: "absolute", bottom: "-80px", left: "-80px", width: "280px", height: "280px", borderRadius: "50%", background: "rgba(255,255,255,0.015)" }} />
+      <div style={{ position: "absolute", top: "-100px", right: "-100px", width: "350px", height: "350px", borderRadius: "50%", background: "rgba(254,151,39,0.05)" }} />
+      <div style={{ position: "absolute", bottom: "-80px", left: "-80px", width: "280px", height: "280px", borderRadius: "50%", background: "rgba(254,151,39,0.03)" }} />
 
       {/* Logo */}
-      <img src="/logo.png" alt="Raj Darbar 2026" style={{
+      <img src="/logo.png" alt="Bharat Synapse@2047" style={{
         width: "200px", height: "auto", marginBottom: "24px",
         borderRadius: "16px",
         background: "rgba(255,255,255,0.95)",
         padding: "10px 14px",
-        boxShadow: "0 8px 32px rgba(255,255,255,0.15)",
+        boxShadow: "0 8px 32px rgba(0,0,0,0.3)",
       }} />
 
       <h1 style={{ fontSize: "28px", fontWeight: 800, color: "#fff", marginBottom: "6px", textAlign: "center" }}>
-        Join RAJ DARBAR 2026
+        Join Bharat Synapse@2047
       </h1>
       <p style={{ fontSize: "14px", color: "rgba(255,255,255,0.6)", marginBottom: "32px", textAlign: "center" }}>
-        Enter your details to access the full experience
+        Enter your details to access the conference
       </p>
 
       {/* Form Card */}
@@ -120,7 +120,7 @@ export default function RegisterPage({ params }: { params: Promise<{ slug: strin
               flex: 1, padding: "10px", border: "none", cursor: "pointer",
               fontSize: "13px", fontWeight: 600, transition: "all 0.2s",
               display: "flex", alignItems: "center", justifyContent: "center", gap: "6px",
-              background: mode === "email" ? "linear-gradient(135deg, #8B0000, #DC143C)" : "transparent",
+              background: mode === "email" ? "#FE9727" : "transparent",
               color: mode === "email" ? "#fff" : "#666",
             }}>
               <Mail style={{ width: "14px", height: "14px" }} /> Email
@@ -129,7 +129,7 @@ export default function RegisterPage({ params }: { params: Promise<{ slug: strin
               flex: 1, padding: "10px", border: "none", cursor: "pointer",
               fontSize: "13px", fontWeight: 600, transition: "all 0.2s",
               display: "flex", alignItems: "center", justifyContent: "center", gap: "6px",
-              background: mode === "phone" ? "linear-gradient(135deg, #8B0000, #DC143C)" : "transparent",
+              background: mode === "phone" ? "#FE9727" : "transparent",
               color: mode === "phone" ? "#fff" : "#666",
             }}>
               <Phone style={{ width: "14px", height: "14px" }} /> Phone
@@ -148,11 +148,11 @@ export default function RegisterPage({ params }: { params: Promise<{ slug: strin
 
         <button type="submit" disabled={loading} style={{
           width: "100%", padding: "16px", borderRadius: "14px", border: "none",
-          background: loading ? "#888" : "linear-gradient(135deg, #8B0000, #DC143C)",
+          background: loading ? "#888" : "#FE9727",
           color: "#fff",
           fontWeight: 700, fontSize: "15px", cursor: loading ? "not-allowed" : "pointer",
           display: "flex", alignItems: "center", justifyContent: "center", gap: "8px",
-          boxShadow: "0 4px 16px rgba(139,0,0,0.3)",
+          boxShadow: "0 4px 16px rgba(254,151,39,0.3)",
           transition: "all 0.2s",
         }}>
           {loading ? <><Loader2 style={{ width: "18px", height: "18px", animation: "spin 1s linear infinite" }} /> Entering...</>
@@ -162,7 +162,7 @@ export default function RegisterPage({ params }: { params: Promise<{ slug: strin
       </form>
 
       <p style={{ marginTop: "24px", fontSize: "12px", color: "rgba(255,255,255,0.25)", letterSpacing: "1px" }}>
-        27 — 28 FEBRUARY 2026
+        5 — 6 MARCH 2026 • IFIM COLLEGE, BENGALURU
       </p>
     </main>
   );

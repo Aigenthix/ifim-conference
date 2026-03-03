@@ -41,25 +41,32 @@ STANDARD_QA_SESSION_TEMPLATES: list[dict[str, object]] = [
         "display_order": 2,
     },
     {
-        "title": "Book Journey: The Ideal Entrepreneur",
-        "speaker_name": "Rahul Agrawal",
+        "title": "Book Journey - The Ideal Entrepreneur",
+        "speaker_name": "Rahul Agarwal",
         "day": 2,
         "time_range": "12:15 – 01:00 PM",
         "display_order": 3,
+    },
+    {
+        "title": "The Powerful Comeback",
+        "speaker_name": "Hitesh Mali",
+        "day": 2,
+        "time_range": "02:15 – 02:30 PM",
+        "display_order": 4,
     },
     {
         "title": "Succession Plan for Financial Distributors",
         "speaker_name": "Jatin Popat",
         "day": 2,
         "time_range": "02:30 – 03:15 PM",
-        "display_order": 4,
+        "display_order": 5,
     },
     {
         "title": "From Insight to Action",
         "speaker_name": "Hitesh Mali",
         "day": 2,
         "time_range": "03:45 – 04:45 PM",
-        "display_order": 5,
+        "display_order": 6,
     },
 ]
 
@@ -164,6 +171,7 @@ async def _ensure_standard_qa_sessions(
 
     synced: list[Session] = []
     created: list[Session] = []
+    dirty = False
 
     for template in STANDARD_QA_SESSION_TEMPLATES:
         day = int(template["day"])
@@ -174,6 +182,10 @@ async def _ensure_standard_qa_sessions(
 
         row = by_key.get(key)
         if row:
+            # Ensure existing session is marked qa_protected
+            if not row.qa_protected:
+                row.qa_protected = True
+                dirty = True
             synced.append(row)
             continue
 
@@ -184,13 +196,14 @@ async def _ensure_standard_qa_sessions(
             day=day,
             display_order=display_order,
             is_active=True,
+            qa_protected=True,
         )
         session.add(row)
         created.append(row)
         synced.append(row)
         by_key[key] = row
 
-    if created:
+    if created or dirty:
         await session.commit()
         for row in created:
             await session.refresh(row)

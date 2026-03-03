@@ -58,7 +58,7 @@ async def get_event_sessions(
 ) -> SessionsListResponse:
     stmt = (
         select(Session)
-        .where(Session.event_id == event_id, Session.is_active == True)
+        .where(Session.event_id == event_id, Session.is_active == True, Session.qa_protected == False)
         .order_by(Session.day, Session.display_order)
     )
     result = await session.execute(stmt)
@@ -146,5 +146,7 @@ async def delete_session(
     result = await session.execute(stmt)
     s = result.scalar_one_or_none()
     if s:
+        if s.qa_protected:
+            return  # Q&A sessions cannot be deleted from the Sessions tab
         await session.delete(s)
         await session.commit()

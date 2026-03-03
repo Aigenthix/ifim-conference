@@ -26,7 +26,7 @@ export default function SessionsSection({ eventId }: { eventId: string }) {
   if (isLoading) {
     return (
       <div style={{ display: "flex", justifyContent: "center", padding: "60px 0" }}>
-        <div style={{ width: "32px", height: "32px", border: "3px solid #eee", borderTopColor: "#DC143C", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
+        <div style={{ width: "32px", height: "32px", border: "3px solid #eee", borderTopColor: "#FE9727", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
         <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
       </div>
     );
@@ -41,7 +41,7 @@ export default function SessionsSection({ eventId }: { eventId: string }) {
           background: "linear-gradient(135deg, #fee2e2, #fecaca)",
           display: "flex", alignItems: "center", justifyContent: "center",
         }}>
-          <Mic style={{ width: "20px", height: "20px", color: "#DC143C" }} />
+          <Mic style={{ width: "20px", height: "20px", color: "#FE9727" }} />
         </div>
         <h2 style={{ fontSize: "22px", fontWeight: 700, color: "#111" }}>Sessions</h2>
       </div>
@@ -55,7 +55,7 @@ export default function SessionsSection({ eventId }: { eventId: string }) {
           <button key={day} onClick={() => setActiveDay(day)} style={{
             flex: 1, padding: "12px 20px", borderRadius: "12px", border: "none",
             cursor: "pointer", fontSize: "14px", fontWeight: 600,
-            background: activeDay === day ? "linear-gradient(135deg, #8B0000, #DC143C)" : "transparent",
+            background: activeDay === day ? "#FE9727" : "transparent",
             color: activeDay === day ? "#fff" : "#666",
             transition: "all 0.2s",
             boxShadow: activeDay === day ? "0 4px 12px rgba(220,20,60,0.3)" : "none",
@@ -137,7 +137,7 @@ function SessionCard({ session, index }: { session: SessionItem; index: number }
         }}>
           <div style={{
             width: "36px", height: "36px", borderRadius: "10px",
-            background: "linear-gradient(135deg, #8B0000, #DC143C)",
+            background: "#FE9727",
             display: "flex", alignItems: "center", justifyContent: "center",
             color: "#fff", fontWeight: 700, fontSize: "13px",
           }}>
@@ -164,7 +164,7 @@ function SessionCard({ session, index }: { session: SessionItem; index: number }
                 background: "#f5f5f5", display: "flex", alignItems: "center", justifyContent: "center",
                 cursor: "pointer", textDecoration: "none",
               }}>
-              <Mic style={{ width: "16px", height: "16px", color: "#DC143C" }} />
+              <Mic style={{ width: "16px", height: "16px", color: "#FE9727" }} />
             </a>
           )}
           {session.video_url && (
@@ -174,7 +174,7 @@ function SessionCard({ session, index }: { session: SessionItem; index: number }
                 background: "#f5f5f5", display: "flex", alignItems: "center", justifyContent: "center",
                 cursor: "pointer", textDecoration: "none",
               }}>
-              <Video style={{ width: "16px", height: "16px", color: "#DC143C" }} />
+              <Video style={{ width: "16px", height: "16px", color: "#FE9727" }} />
             </a>
           )}
           <motion.div animate={{ rotate: isExpanded ? 90 : 0 }}>
@@ -206,7 +206,7 @@ function SessionCard({ session, index }: { session: SessionItem; index: number }
                     onClick={(e) => e.stopPropagation()} 
                     style={{
                       display: "inline-flex", alignItems: "center", gap: "6px",
-                      color: "#DC143C", fontWeight: 600, fontSize: "13px", textDecoration: "none",
+                      color: "#FE9727", fontWeight: 600, fontSize: "13px", textDecoration: "none",
                       padding: "8px 14px", background: "#fff5f5", borderRadius: "8px"
                     }}
                   >

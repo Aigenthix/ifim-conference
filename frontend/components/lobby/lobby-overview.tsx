@@ -10,21 +10,9 @@ type TeamMember = { name: string; role?: string };
 type ScheduleItem = { time: string; title: string; day: string };
 type Overview = { venue?: string; dress_code?: string; schedule?: ScheduleItem[] };
 
-const SPEAKER_IMAGES: Record<string, string> = {
-  "Hitesh Mali": "/speakers/hitesh-mali.png",
-  "Siddharth Karnawat": "/speakers/siddharth-karnawat.png",
-  "Nikhil Naik": "/speakers/nikhil-naik.png",
-  "Jatin Popat": "/speakers/jatin-popat.png",
-  "Rahul Agarwal": "/speakers/rahul-agarwal.png",
-};
+const SPEAKER_IMAGES: Record<string, string> = {};
 
-const SPEAKER_BIOS: Record<string, string> = {
-  "Siddharth Karnawat": "Mr. Siddharth Karnawat is a seasoned financial professional and entrepreneur with over 15 years of experience in the financial services industry. He holds a Bachelor’s degree in Commerce from the prestigious H.R. College of Commerce & Economics, Mumbai. As the Co-Founder of Blue Sky Fintech, he has been instrumental in building the firm with a vision to provide transparent, independent, and goal-based wealth management solutions focused on long-term value creation.\n\nSiddharth brings deep expertise in wealth management, investment strategy, and family office governance. His client-centric philosophy emphasizes disciplined capital allocation, prudent risk management, and sustainable wealth creation, helping families balance wealth preservation with long-term growth.\n\nA committed philanthropist, Mr. Karnawat is a Fellow Chartered Member (FCP) of JITO (Jain International Trade Organization), an active member of the prestigious Mumbai Cricket Association Club, BKC Mumbai, and a Donor Member of RVG Hostel, Mumbai. He is deeply involved in community development initiatives and strongly believes in using wealth as a catalyst for social progress and societal well-being.\n\nMr. Karnawat is also the host of “Blue Sky Talks,” a thought-leadership podcast platform where he engages with prominent personalities from finance, business, and sports. He has recently hosted insightful conversations with renowned market expert Mr. Anil Singhvi (Zee Business) and Indian international cricketer Mr. Deepak Chahar (India - Mumbai Indians).\n\nKnown for his strategic foresight, calm decision-making, and client-first approach, Siddharth Karnawat continues to contribute to industry thought leadership in areas such as wealth structuring, generational wealth transfer, and global investment trends. Through his dual roles as an entrepreneur, investor, and philanthropist, he exemplifies the modern wealth visionary — disciplined, forward-thinking, and committed to building enduring financial legacies.",
-  "Jatin Popat": "Mr. Jatin Popat is a qualified Lawyer & Company Secretary and has an experience of more than 30 years in Legal matters in India. He is the founder of WillJini, India’s first and most Trusted Succession services company.\n\nBefore founding WillJini, Mr. Jatin has headed Legal & Compliances in Gulf Oil, a listed Hinduja Group company.\n\nMr. Jatin has conducted 1,000+ awareness sessions across India - with a vision of “Harr Gharr ek Will” - to make wealth transfer a simple process which currently is full of legal hassles, confusion and misinformation.\n\nToday, WillJini is India’s No. 1 company in Succession Matters and has helped more than 20,000 families with Wills and Inheritance across 480 cities and 32 countries.",
-  "Hitesh Mali": "Mr. Hitesh Mali is the Founder of Equitywala.com, a leading financial services platform. He brings extensive experience in the financial markets and is known for his expertise in equity research, investment advisory, and wealth management solutions.",
-  "Nikhil Naik": "Mr. Nikhil Naik is the Founder of AD Naik Wealth, a wealth management firm dedicated to helping individuals and families achieve their financial goals through strategic investment planning and portfolio management.",
-  "Rahul Agarwal": "Mr. Rahul Agarwal is the Founder of Ideal Insurance Brokers, a company specializing in providing comprehensive insurance solutions. With deep industry knowledge, he helps clients navigate complex insurance requirements with tailored advisory services.",
-};
+const SPEAKER_BIOS: Record<string, string> = {};
 
 export default function LobbyOverview({ lobby }: { lobby: EventLobby }) {
   const { userId, eventId, userName, userEmail, userPhone, userCompany, userFoodPreference, userTshirtSize, userGrowthFocus } = useAuthStore();
@@ -69,13 +57,13 @@ export default function LobbyOverview({ lobby }: { lobby: EventLobby }) {
           borderRadius: "16px",
           background: "#ffffff",
           padding: "24px 28px",
-          boxShadow: "0 4px 20px rgba(139,0,0,0.08)",
-          border: "1px solid #fee2e2",
+          boxShadow: "0 4px 20px rgba(254,151,39,0.1)",
+          border: "1px solid #fed7aa",
         }}>
           <div style={{ display: "flex", alignItems: "flex-start", gap: "14px" }}>
             <div style={{
               width: "40px", height: "40px", borderRadius: "12px",
-              background: "linear-gradient(135deg, #8B0000, #DC143C)",
+              background: "#FE9727",
               display: "flex", alignItems: "center", justifyContent: "center",
               flexShrink: 0,
             }}>
@@ -83,16 +71,16 @@ export default function LobbyOverview({ lobby }: { lobby: EventLobby }) {
             </div>
             <div>
               <h2 style={{
-                fontSize: "18px", fontWeight: 800, color: "#8B0000",
+                fontSize: "18px", fontWeight: 800, color: "#000000",
                 margin: 0, lineHeight: 1.3,
               }}>
-                {userName}, Welcome to Raj Darbar 2026
+                {userName}, Welcome to Bharat Synapse@2047
               </h2>
               <p style={{
-                fontSize: "13px", color: "#DC143C", margin: "6px 0 0",
+                fontSize: "13px", color: "#FE9727", margin: "6px 0 0",
                 lineHeight: 1.5, opacity: 0.85,
               }}>
-                An exclusive platform for market leaders and bold entrepreneurs.
+                A national interdisciplinary academic platform for India&apos;s future.
               </p>
             </div>
           </div>
@@ -109,7 +97,7 @@ export default function LobbyOverview({ lobby }: { lobby: EventLobby }) {
             <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
               <div style={{
                 width: "32px", height: "32px", borderRadius: "8px",
-                background: "linear-gradient(135deg, #8B0000, #DC143C)",
+                background: "#FE9727",
                 display: "flex", alignItems: "center", justifyContent: "center",
               }}>
                 <QrCode style={{ width: "16px", height: "16px", color: "#fff" }} />
@@ -120,7 +108,7 @@ export default function LobbyOverview({ lobby }: { lobby: EventLobby }) {
               onClick={() => setShowQr(!showQr)}
               style={{
                 padding: "8px 18px", borderRadius: "10px", border: "none",
-                background: showQr ? "#f0f0f0" : "linear-gradient(135deg, #8B0000, #DC143C)",
+                background: showQr ? "#f0f0f0" : "#FE9727",
                 color: showQr ? "#666" : "#fff",
                 fontSize: "13px", fontWeight: 600, cursor: "pointer",
                 transition: "all 0.2s",
@@ -168,15 +156,15 @@ export default function LobbyOverview({ lobby }: { lobby: EventLobby }) {
 
       {/* Hero Card */}
       <motion.div variants={fadeUp} initial="hidden" animate="show" style={{
-        borderRadius: "20px", background: "linear-gradient(135deg, #8B0000, #DC143C)",
+        borderRadius: "20px", background: "#FE9727",
         padding: "36px", color: "#fff", position: "relative", overflow: "hidden",
-        boxShadow: "0 8px 32px rgba(139,0,0,0.25)",
+        boxShadow: "0 8px 32px rgba(254,151,39,0.25)",
       }}>
         <div style={{ position: "absolute", top: "-60px", right: "-60px", width: "200px", height: "200px", borderRadius: "50%", background: "rgba(255,255,255,0.06)" }} />
         <div style={{ position: "relative" }}>
           {/* Logo — prominent with white bg */}
           <div style={{ display: "flex", alignItems: "center", gap: "16px", marginBottom: "20px" }}>
-            <img src="/logo.png" alt="The Next Big Thing | Equitywala.com" style={{
+            <img src="/logo.png" alt="Bharat Synapse@2047 — IFIM School of Technology" style={{
               height: "60px", padding: "8px 12px", background: "rgba(255,255,255,0.95)",
               borderRadius: "12px", objectFit: "contain",
               boxShadow: "0 4px 16px rgba(0,0,0,0.15)",
@@ -185,15 +173,15 @@ export default function LobbyOverview({ lobby }: { lobby: EventLobby }) {
           <h1 style={{ fontSize: "clamp(26px, 5vw, 38px)", fontWeight: 800, marginBottom: "6px", letterSpacing: "-0.5px" }}>
             {lobby.title}
           </h1>
-          <p style={{ color: "#FFD700", fontSize: "16px", fontWeight: 600, fontStyle: "italic", marginBottom: "10px" }}>
-            Time to Rule Your Segment
+          <p style={{ color: "#FE9727", fontSize: "16px", fontWeight: 600, fontStyle: "italic", marginBottom: "10px" }}>
+            Contours of a Future-ready Bharat
           </p>
           <p style={{ color: "rgba(255,255,255,0.8)", fontSize: "15px", maxWidth: "600px", lineHeight: 1.7 }}>
             {lobby.description}
           </p>
           <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", marginTop: "20px" }}>
-            <Pill icon={Calendar} text="27–28 February 2026" />
-            <Pill icon={Clock} text="10:00 AM – 05:00 PM" />
+            <Pill icon={Calendar} text="5–6 March 2026" />
+            <Pill icon={Clock} text="Day 1: 2:30–4:00 PM • Day 2: 10:00 AM–1:15 PM" />
             {overview?.venue && <Pill icon={MapPin} text={overview.venue} />}
             {overview?.dress_code && <Pill icon={Shirt} text={overview.dress_code} />}
           </div>
@@ -208,15 +196,15 @@ export default function LobbyOverview({ lobby }: { lobby: EventLobby }) {
           boxShadow: "0 2px 12px rgba(0,0,0,0.04)",
         }}>
         <div style={{ display: "flex", alignItems: "center", gap: "8px", flex: 1, minWidth: "200px" }}>
-          <Phone style={{ width: "16px", height: "16px", color: "#8B0000" }} />
-          <span style={{ fontSize: "13px", color: "#555" }}>9321064995</span>
+          <Phone style={{ width: "16px", height: "16px", color: "#000000" }} />
+          <span style={{ fontSize: "13px", color: "#555" }}>+91 9742111344</span>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: "8px", flex: 1, minWidth: "200px" }}>
-          <Globe style={{ width: "16px", height: "16px", color: "#8B0000" }} />
-          <span style={{ fontSize: "13px", color: "#555" }}>www.equitywala.com</span>
+          <Globe style={{ width: "16px", height: "16px", color: "#000000" }} />
+          <span style={{ fontSize: "13px", color: "#555" }}>www.ifimbharatsynapse2047.com</span>
         </div>
-        <div style={{ fontSize: "12px", color: "#DC143C", fontWeight: 600, fontStyle: "italic" }}>
-          *Entry by Invitation Only
+        <div style={{ fontSize: "12px", color: "#FE9727", fontWeight: 600, fontStyle: "italic" }}>
+          viksitbharat2026@ifim.edu.in
         </div>
       </motion.div>
 
@@ -251,7 +239,7 @@ export default function LobbyOverview({ lobby }: { lobby: EventLobby }) {
               }}>
                 <div style={{
                   width: "44px", height: "44px", margin: "0 auto 10px", borderRadius: "50%",
-                  background: "linear-gradient(135deg, #DC143C, #FF6B6B)",
+                  background: "linear-gradient(135deg, #FE9727, #FF6B6B)",
                   display: "flex", alignItems: "center", justifyContent: "center",
                   color: "#fff", fontWeight: 700, fontSize: "16px",
                   overflow: "hidden"
@@ -319,12 +307,12 @@ function SpeakerCard({ speaker }: { speaker: Speaker }) {
           {imgSrc ? (
             <img src={imgSrc} alt={speaker.name} style={{
               width: "56px", height: "56px", borderRadius: "50%",
-              objectFit: "cover", border: "3px solid #DC143C", flexShrink: 0,
+              objectFit: "cover", border: "3px solid #FE9727", flexShrink: 0,
             }} />
           ) : (
             <div style={{
               width: "56px", height: "56px", borderRadius: "50%",
-              background: "linear-gradient(135deg, #8B0000, #DC143C)",
+              background: "#FE9727",
               display: "flex", alignItems: "center", justifyContent: "center",
               color: "#fff", fontWeight: 700, fontSize: "20px", flexShrink: 0,
             }}>
@@ -336,7 +324,7 @@ function SpeakerCard({ speaker }: { speaker: Speaker }) {
               {speaker.name}
             </h3>
             {speaker.title && (
-              <p style={{ fontSize: "13px", color: "#8B0000", fontWeight: 600, marginTop: "5px", marginBottom: 0 }}>
+              <p style={{ fontSize: "13px", color: "#000000", fontWeight: 600, marginTop: "5px", marginBottom: 0 }}>
                 {speaker.title}
               </p>
             )}
@@ -369,7 +357,7 @@ function SpeakerCard({ speaker }: { speaker: Speaker }) {
             border: "none",
             borderRadius: "10px",
             padding: "10px 12px",
-            background: hasBio ? "linear-gradient(135deg, #8B0000, #DC143C)" : "#ededed",
+            background: hasBio ? "#FE9727" : "#ededed",
             color: hasBio ? "#fff" : "#8f8f8f",
             fontSize: "12px",
             fontWeight: 700,
@@ -435,7 +423,7 @@ function SpeakerCard({ speaker }: { speaker: Speaker }) {
                   {speaker.name}
                 </h3>
                 {speaker.title && (
-                  <p style={{ margin: "5px 0 0", fontSize: "13px", color: "#8B0000", fontWeight: 600 }}>
+                  <p style={{ margin: "5px 0 0", fontSize: "13px", color: "#000000", fontWeight: 600 }}>
                     {speaker.title}
                   </p>
                 )}
@@ -498,13 +486,13 @@ function ScheduleDropdown({ day, items, defaultOpen }: { day: string; items: Sch
     <div style={{ marginBottom: "12px", borderRadius: "14px", border: "1px solid #f0f0f0", overflow: "hidden" }}>
       <button onClick={() => setOpen(!open)} style={{
         width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between",
-        padding: "14px 18px", background: open ? "linear-gradient(135deg, #8B0000, #DC143C)" : "#fafafa",
+        padding: "14px 18px", background: open ? "#FE9727" : "#fafafa",
         border: "none", cursor: "pointer", transition: "background 0.2s",
       }}>
         <span style={{
           fontSize: "13px", fontWeight: 700, letterSpacing: "0.5px",
           textTransform: "uppercase" as const,
-          color: open ? "#fff" : "#DC143C",
+          color: open ? "#fff" : "#FE9727",
         }}>
           {day}
         </span>
@@ -528,7 +516,7 @@ function ScheduleDropdown({ day, items, defaultOpen }: { day: string; items: Sch
               padding: "12px 14px", borderRadius: "10px", background: "#fff",
               border: "1px solid #f5f5f5",
             }}>
-              <span style={{ fontSize: "13px", fontWeight: 600, color: "#8B0000", minWidth: "130px", fontFamily: "monospace" }}>{item.time}</span>
+              <span style={{ fontSize: "13px", fontWeight: 600, color: "#000000", minWidth: "130px", fontFamily: "monospace" }}>{item.time}</span>
               <span style={{ fontSize: "14px", color: "#333", fontWeight: 500 }}>{item.title}</span>
             </div>
           ))}
@@ -559,7 +547,7 @@ function Section({ title, icon: Icon, delay, children }: { title: string; icon: 
       <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "20px" }}>
         <div style={{
           width: "36px", height: "36px", borderRadius: "10px",
-          background: "linear-gradient(135deg, #8B0000, #DC143C)",
+          background: "#FE9727",
           display: "flex", alignItems: "center", justifyContent: "center",
         }}>
           <Icon style={{ width: "18px", height: "18px", color: "#fff" }} />

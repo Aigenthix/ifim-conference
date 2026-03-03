@@ -416,7 +416,7 @@ export default function ChatbotFAB({ eventId }: { eventId: string }) {
           position: "fixed", bottom: "24px", right: "24px", zIndex: 50,
           height: "52px", borderRadius: "26px",
           padding: "0 20px",
-          background: "linear-gradient(135deg, #8B0000, #DC143C)",
+          background: "#FE9727",
           color: "#fff", border: "none", cursor: "pointer",
           display: "flex", alignItems: "center", justifyContent: "center", gap: "10px",
           boxShadow: "0 8px 24px rgba(220,20,60,0.4)",
@@ -518,7 +518,7 @@ function ChatPanel({ eventId, token }: { eventId: string; token: string }) {
       <div style={{
         display: "flex", alignItems: "center", gap: "12px", padding: "16px 20px",
         borderBottom: "1px solid #eee",
-        background: "linear-gradient(135deg, #8B0000, #DC143C)", color: "#fff",
+        background: "#FE9727", color: "#fff",
       }}>
         <div style={{ width: "32px", height: "32px", borderRadius: "50%", background: "rgba(255,255,255,0.2)", display: "flex", alignItems: "center", justifyContent: "center" }}>
           <Bot style={{ width: "16px", height: "16px", color: "#fff" }} />
@@ -550,14 +550,14 @@ function ChatPanel({ eventId, token }: { eventId: string; token: string }) {
           <motion.div key={msg.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
             style={{ display: "flex", gap: "10px", justifyContent: msg.role === "user" ? "flex-end" : "flex-start" }}>
             {msg.role === "assistant" && (
-              <div style={{ width: "28px", height: "28px", borderRadius: "50%", background: "linear-gradient(135deg, #8B0000, #DC143C)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginTop: "4px" }}>
+              <div style={{ width: "28px", height: "28px", borderRadius: "50%", background: "#FE9727", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginTop: "4px" }}>
                 <Bot style={{ width: "14px", height: "14px", color: "#fff" }} />
               </div>
             )}
             <div style={{
               maxWidth: "80%", padding: "12px 16px", borderRadius: "16px", fontSize: "14px", lineHeight: 1.6,
               ...(msg.role === "user"
-                ? { background: "linear-gradient(135deg, #8B0000, #DC143C)", color: "#fff", borderBottomRightRadius: "4px" }
+                ? { background: "#FE9727", color: "#fff", borderBottomRightRadius: "4px" }
                 : { background: "#f5f5f5", color: "#333", borderBottomLeftRadius: "4px" }),
             }}>
               {msg.content.split("\n").map((line, i) => {
@@ -577,7 +577,7 @@ function ChatPanel({ eventId, token }: { eventId: string; token: string }) {
                 if (isListItem) {
                   return (
                     <div key={i} style={{ display: "flex", gap: "6px", marginTop: "4px" }}>
-                      <span style={{ color: "#8B0000" }}>•</span>
+                      <span style={{ color: "#000000" }}>•</span>
                       <span>{formattedLine}</span>
                     </div>
                   );
@@ -591,7 +591,7 @@ function ChatPanel({ eventId, token }: { eventId: string; token: string }) {
 
         {isLoading && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ display: "flex", gap: "10px" }}>
-            <div style={{ width: "28px", height: "28px", borderRadius: "50%", background: "linear-gradient(135deg, #8B0000, #DC143C)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+            <div style={{ width: "28px", height: "28px", borderRadius: "50%", background: "#FE9727", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
               <Bot style={{ width: "14px", height: "14px", color: "#fff" }} />
             </div>
             <div style={{ background: "#f5f5f5", borderRadius: "16px", padding: "12px 16px", display: "flex", gap: "4px" }}>
@@ -616,7 +616,7 @@ function ChatPanel({ eventId, token }: { eventId: string; token: string }) {
           <button type="submit" disabled={isLoading}
             style={{
               width: "42px", height: "42px", borderRadius: "14px",
-              background: "linear-gradient(135deg, #8B0000, #DC143C)", color: "#fff",
+              background: "#FE9727", color: "#fff",
               border: "none", cursor: isLoading ? "not-allowed" : "pointer",
               display: "flex", alignItems: "center", justifyContent: "center",
               opacity: isLoading ? 0.5 : 1,

@@ -72,7 +72,7 @@ export default function FeedbackSection({ eventId }: { eventId: string }) {
     <div style={{ maxWidth: "480px", margin: "0 auto" }}>
       <div style={{ borderRadius: "20px", background: "#fff", border: "1px solid #eee", padding: "32px", boxShadow: "0 2px 12px rgba(0,0,0,0.04)" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "24px" }}>
-          <div style={{ width: "36px", height: "36px", borderRadius: "10px", background: "linear-gradient(135deg, #8B0000, #DC143C)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <div style={{ width: "36px", height: "36px", borderRadius: "10px", background: "#FE9727", display: "flex", alignItems: "center", justifyContent: "center" }}>
             <Star style={{ width: "18px", height: "18px", color: "#fff" }} />
           </div>
           <h2 style={{ fontSize: "20px", fontWeight: 700, color: "#111" }}>Share Your Feedback</h2>
@@ -110,7 +110,7 @@ export default function FeedbackSection({ eventId }: { eventId: string }) {
             style={{
               width: "100%", padding: "14px", borderRadius: "14px", fontWeight: 700,
               fontSize: "15px", color: "#fff", cursor: loading || rating === 0 ? "not-allowed" : "pointer",
-              background: rating === 0 ? "#ccc" : "linear-gradient(135deg, #8B0000, #DC143C)",
+              background: rating === 0 ? "#ccc" : "#FE9727",
               border: "none", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px",
               opacity: loading ? 0.7 : 1, boxShadow: rating > 0 ? "0 4px 16px rgba(220,20,60,0.3)" : "none",
             }}>

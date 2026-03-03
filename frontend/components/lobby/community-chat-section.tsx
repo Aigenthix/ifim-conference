@@ -139,7 +139,7 @@ export default function CommunityChatSection({ eventId }: { eventId: string }) {
 
   // Color based on user name hash
   const getColor = (name: string) => {
-    const colors = ["#DC143C", "#8B0000", "#E67E22", "#2E86C1", "#27AE60", "#8E44AD", "#C0392B", "#16A085"];
+    const colors = ["#FE9727", "#000000", "#E67E22", "#2E86C1", "#27AE60", "#8E44AD", "#C0392B", "#16A085"];
     let hash = 0;
     for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
     return colors[Math.abs(hash) % colors.length];
@@ -151,7 +151,7 @@ export default function CommunityChatSection({ eventId }: { eventId: string }) {
       <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "20px" }}>
         <div style={{
           width: "40px", height: "40px", borderRadius: "12px",
-          background: "linear-gradient(135deg, #8B0000, #DC143C)",
+          background: "#FE9727",
           display: "flex", alignItems: "center", justifyContent: "center",
         }}>
           <MessageCircle style={{ width: "20px", height: "20px", color: "#fff" }} />
@@ -184,7 +184,7 @@ export default function CommunityChatSection({ eventId }: { eventId: string }) {
         }}>
           {loading ? (
             <div style={{ textAlign: "center", padding: "40px" }}>
-              <div style={{ width: "28px", height: "28px", border: "3px solid #eee", borderTopColor: "#DC143C", borderRadius: "50%", animation: "spin 0.8s linear infinite", margin: "0 auto" }} />
+              <div style={{ width: "28px", height: "28px", border: "3px solid #eee", borderTopColor: "#FE9727", borderRadius: "50%", animation: "spin 0.8s linear infinite", margin: "0 auto" }} />
               <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
             </div>
           ) : messages.length === 0 ? (
@@ -220,14 +220,14 @@ export default function CommunityChatSection({ eventId }: { eventId: string }) {
                     <div style={{ display: "flex", alignItems: "center", gap: "6px", flexDirection: isMe ? "row-reverse" : "row" }}>
                       <div style={{
                         padding: "10px 14px", borderRadius: isMe ? "14px 14px 4px 14px" : "14px 14px 14px 4px",
-                        background: isMe ? "linear-gradient(135deg, #8B0000, #DC143C)" : "#f5f5f5",
+                        background: isMe ? "#FE9727" : "#f5f5f5",
                         color: isMe ? "#fff" : "#333", fontSize: "14px", lineHeight: 1.5,
                         whiteSpace: "pre-wrap", wordBreak: "break-word"
                       }}>
                         {m.reply_to_message && (
                           <div style={{
                             fontSize: "12px", background: "rgba(0,0,0,0.06)", borderRadius: "6px",
-                            padding: "6px 10px", marginBottom: "6px", borderLeft: `3px solid ${isMe ? "#fff" : "#8B0000"}`,
+                            padding: "6px 10px", marginBottom: "6px", borderLeft: `3px solid ${isMe ? "#fff" : "#000000"}`,
                             color: isMe ? "rgba(255,255,255,0.9)" : "#666",
                             display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden"
                           }}>
@@ -246,7 +246,7 @@ export default function CommunityChatSection({ eventId }: { eventId: string }) {
                           transition: "color 0.2s"
                         }}
                         title="Reply"
-                        onMouseEnter={(e) => e.currentTarget.style.color = "#8B0000"}
+                        onMouseEnter={(e) => e.currentTarget.style.color = "#000000"}
                         onMouseLeave={(e) => e.currentTarget.style.color = "#ccc"}
                       >
                         <Reply style={{ width: "14px", height: "14px" }} />
@@ -275,9 +275,9 @@ export default function CommunityChatSection({ eventId }: { eventId: string }) {
                 display: "flex", alignItems: "center", gap: "12px", overflow: "hidden"
               }}
             >
-              <div style={{ width: "3px", height: "30px", background: "#8B0000", borderRadius: "2px" }} />
+              <div style={{ width: "3px", height: "30px", background: "#000000", borderRadius: "2px" }} />
               <div style={{ flex: 1, overflow: "hidden" }}>
-                <span style={{ fontSize: "11px", fontWeight: 600, color: "#8B0000", display: "block" }}>
+                <span style={{ fontSize: "11px", fontWeight: 600, color: "#000000", display: "block" }}>
                   Replying to {replyTo.user_name}
                 </span>
                 <span style={{ fontSize: "12px", color: "#666", display: "block", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
@@ -329,7 +329,7 @@ export default function CommunityChatSection({ eventId }: { eventId: string }) {
               type="button"
               onClick={() => setShowEmojiPicker(!showEmojiPicker)}
               style={{
-                background: "none", border: "none", cursor: "pointer", color: showEmojiPicker ? "#8B0000" : "#999",
+                background: "none", border: "none", cursor: "pointer", color: showEmojiPicker ? "#000000" : "#999",
                 display: "flex", alignItems: "center", justifyContent: "center", transition: "color 0.2s"
               }}
             >
@@ -358,7 +358,7 @@ export default function CommunityChatSection({ eventId }: { eventId: string }) {
             />
             <button type="submit" disabled={sending || !newMsg.trim()} style={{
               width: "40px", height: "40px", borderRadius: "50%", border: "none", cursor: "pointer",
-              background: newMsg.trim() ? "linear-gradient(135deg, #8B0000, #DC143C)" : "#eee",
+              background: newMsg.trim() ? "#FE9727" : "#eee",
               display: "flex", alignItems: "center", justifyContent: "center",
               transition: "all 0.2s",
             }}>

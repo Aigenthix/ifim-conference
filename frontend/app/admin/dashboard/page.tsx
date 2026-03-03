@@ -34,7 +34,7 @@ export default function AdminDashboardRedirect() {
         background: "#0a0a0a", color: "#fff", fontFamily: "'Inter', sans-serif",
       }}>
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "16px" }}>
-          <div style={{ width: "36px", height: "36px", border: "3px solid #333", borderTopColor: "#DC143C", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
+          <div style={{ width: "36px", height: "36px", border: "3px solid #333", borderTopColor: "#FE9727", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
           <p style={{ color: "#666", fontSize: "14px" }}>Loading dashboard...</p>
         </div>
         <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>

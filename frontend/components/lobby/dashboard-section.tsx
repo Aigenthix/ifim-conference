@@ -236,20 +236,20 @@ export default function DashboardSection({
         label: "Registrations",
         value: formatNumber(dashboard.total_registrations),
         icon: Users,
-        color: "#8B0000",
+        color: "#000000",
       },
       {
         label: "Live Users",
         value: formatNumber(dashboard.live_concurrent_users),
         icon: Activity,
-        color: "#DC143C",
+        color: "#FE9727",
         badge: "Live",
       },
       {
         label: "Total Votes",
         value: formatNumber(dashboard.total_votes),
         icon: BarChart3,
-        color: "#8B0000",
+        color: "#000000",
       },
       {
         label: "Avg Rating",
@@ -257,25 +257,25 @@ export default function DashboardSection({
           ? dashboard.average_rating.toFixed(1)
           : "0.0",
         icon: Star,
-        color: "#DC143C",
+        color: "#FE9727",
       },
       {
         label: "Feedback",
         value: formatNumber(dashboard.total_feedback),
         icon: MessageSquare,
-        color: "#8B0000",
+        color: "#000000",
       },
       {
         label: "AI Queries",
         value: formatNumber(dashboard.total_queries),
         icon: TrendingUp,
-        color: "#DC143C",
+        color: "#FE9727",
       },
       {
         label: "Active Polls",
         value: formatNumber(dashboard.total_polls),
         icon: Award,
-        color: "#8B0000",
+        color: "#000000",
       },
     ];
   }, [dashboard]);
@@ -343,7 +343,7 @@ export default function DashboardSection({
           font-size: 40px;
           line-height: 0.98;
           font-weight: 900;
-          color: #8b0000;
+          color: #000000;
           letter-spacing: -0.03em;
           margin: 0;
         }
@@ -378,7 +378,7 @@ export default function DashboardSection({
           border: 1px solid #f1d1d1;
           background: #fff5f5;
           padding: 6px 10px;
-          color: #8b0000;
+          color: #000000;
           font-size: 12px;
           font-weight: 700;
         }
@@ -449,7 +449,7 @@ export default function DashboardSection({
           line-height: 0.96;
           font-weight: 900;
           letter-spacing: -0.04em;
-          color: #8b0000;
+          color: #000000;
         }
         .lobby-dashboard-card-label {
           margin-top: 6px;
@@ -503,7 +503,7 @@ export default function DashboardSection({
           width: 24px;
           height: 24px;
           border-radius: 8px;
-          background: linear-gradient(135deg, #8b0000, #dc143c);
+          background: "#FE9727";
           color: #fff;
           display: inline-flex;
           align-items: center;
@@ -548,7 +548,7 @@ export default function DashboardSection({
         .lobby-dashboard-signal-percent {
           font-size: 12px;
           font-weight: 800;
-          color: #8b0000;
+          color: #000000;
         }
         .lobby-dashboard-signal-track {
           height: 8px;
@@ -560,7 +560,7 @@ export default function DashboardSection({
         .lobby-dashboard-signal-fill {
           height: 100%;
           border-radius: 999px;
-          background: linear-gradient(90deg, #8b0000 0%, #dc143c 100%);
+          background: "#FE9727";
         }
         .lobby-dashboard-signal-detail {
           margin-top: 5px;
@@ -655,7 +655,7 @@ export default function DashboardSection({
                       }}
                     />
                   </div>
-                  <p className="lobby-dashboard-card-value" style={{ color: "#8b0000" }}>{stat.value}</p>
+                  <p className="lobby-dashboard-card-value" style={{ color: "#000000" }}>{stat.value}</p>
                   <p className="lobby-dashboard-card-label">{stat.label}</p>
                 </article>
               );

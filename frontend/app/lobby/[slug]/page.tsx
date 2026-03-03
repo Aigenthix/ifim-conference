@@ -83,7 +83,7 @@ export default function LobbyPage({ params }: { params: Promise<{ slug: string }
               <div style={{ display: "flex", alignItems: "flex-start", gap: "12px" }}>
                 <div style={{
                   width: "36px", height: "36px", borderRadius: "10px", flexShrink: 0,
-                  background: "linear-gradient(135deg, #8B0000, #DC143C)",
+                  background: "#FE9727",
                   display: "flex", alignItems: "center", justifyContent: "center",
                 }}>
                   <Bell style={{ width: "18px", height: "18px", color: "#fff" }} />
@@ -98,8 +98,8 @@ export default function LobbyPage({ params }: { params: Promise<{ slug: string }
                 position: "top-center",
                 style: {
                   background: "#fff",
-                  border: "1px solid #fecaca",
-                  boxShadow: "0 8px 32px rgba(139,0,0,0.15)",
+                  border: "1px solid #fed7aa",
+                  boxShadow: "0 8px 32px rgba(254,151,39,0.15)",
                   borderRadius: "14px",
                   padding: "16px",
                 },
@@ -165,7 +165,7 @@ export default function LobbyPage({ params }: { params: Promise<{ slug: string }
     return (
       <div style={{ minHeight: "100dvh", display: "flex", alignItems: "center", justifyContent: "center", background: "#fafafa" }}>
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "16px" }}>
-          <div style={{ width: "36px", height: "36px", border: "3px solid #eee", borderTopColor: "#DC143C", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
+          <div style={{ width: "36px", height: "36px", border: "3px solid #eee", borderTopColor: "#FE9727", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
           <p style={{ color: "#888", fontSize: "14px" }}>Loading event...</p>
         </div>
         <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
@@ -316,14 +316,14 @@ export default function LobbyPage({ params }: { params: Promise<{ slug: string }
 
       {/* Header — compact on mobile */}
       <header style={{
-        background: "linear-gradient(135deg, #8B0000, #DC143C)",
+        background: "linear-gradient(135deg, #1a1040, #2d1b69)",
         position: "sticky", top: 0, zIndex: 50,
-        boxShadow: "0 4px 20px rgba(139,0,0,0.3)",
+        boxShadow: "0 4px 20px rgba(26,16,64,0.4)",
       }}>
         <nav className="topbar-nav">
           {/* Logo */}
           <div className="topbar-left">
-            <img src="/logo.png" alt="Raj Darbar" className="topbar-logo" />
+            <img src="/logo.png" alt="Bharat Synapse@2047" className="topbar-logo" />
           </div>
 
           {/* Desktop Tabs */}
@@ -419,7 +419,7 @@ export default function LobbyPage({ params }: { params: Promise<{ slug: string }
                 <div style={{
                   width: "32px", height: "32px", borderRadius: "10px",
                   display: "flex", alignItems: "center", justifyContent: "center",
-                  background: isActive ? "linear-gradient(135deg, #8B0000, #DC143C)" : "transparent",
+                  background: isActive ? "#FE9727" : "transparent",
                   transition: "all 0.2s",
                 }}>
                   <Icon style={{
@@ -431,7 +431,7 @@ export default function LobbyPage({ params }: { params: Promise<{ slug: string }
                 <span className="mobile-tab-label" style={{
                   fontSize: "10px",
                   fontWeight: isActive ? 700 : 500,
-                  color: isActive ? "#8B0000" : "#999",
+                  color: isActive ? "#000000" : "#999",
                   letterSpacing: "-0.2px",
                   transition: "all 0.15s",
                 }}>{s.label}</span>

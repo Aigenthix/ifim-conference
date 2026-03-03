@@ -127,7 +127,7 @@ export default function LivePolls({ eventId }: { eventId: string }) {
       {/* Header */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "12px" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-          <div style={{ width: "36px", height: "36px", borderRadius: "10px", background: "linear-gradient(135deg, #8B0000, #DC143C)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <div style={{ width: "36px", height: "36px", borderRadius: "10px", background: "#FE9727", display: "flex", alignItems: "center", justifyContent: "center" }}>
             <BarChart3 style={{ width: "18px", height: "18px", color: "#fff" }} />
           </div>
           <h2 style={{ fontSize: "20px", fontWeight: 700, color: "#111" }}>Live Polls</h2>
@@ -162,7 +162,7 @@ export default function LivePolls({ eventId }: { eventId: string }) {
             <button key={i} onClick={() => navigate(i)} style={{
                   width: i === safeCurrentIndex ? "24px" : "8px", height: "8px",
                   borderRadius: "999px", border: "none", cursor: "pointer",
-                  background: i === safeCurrentIndex ? "#DC143C" : "#ddd",
+                  background: i === safeCurrentIndex ? "#FE9727" : "#ddd",
                   transition: "all 0.3s",
                 }} />
               ))}
@@ -189,7 +189,7 @@ export default function LivePolls({ eventId }: { eventId: string }) {
           <button onClick={() => navigate("next")} style={{
             display: "flex", alignItems: "center", gap: "8px",
             padding: "10px 24px", borderRadius: "12px",
-            border: "none", background: "linear-gradient(135deg, #8B0000, #DC143C)", cursor: "pointer",
+            border: "none", background: "#FE9727", cursor: "pointer",
             fontSize: "13px", fontWeight: 600, color: "#fff",
             transition: "all 0.2s",
           }}>
@@ -259,7 +259,7 @@ const PollCard = memo(function PollCard({ poll, token }: { poll: import("@/lib/a
               style={{
                 position: "relative", width: "100%", overflow: "hidden", borderRadius: "14px",
                 padding: "16px 18px", textAlign: "left" as const, cursor: isPending ? "wait" : "pointer",
-                border: isSelected ? "2px solid #DC143C" : "1px solid #eee",
+                border: isSelected ? "2px solid #FE9727" : "1px solid #eee",
                 background: isSelected ? "rgba(220,20,60,0.05)" : "#fafafa",
                 transition: "all 0.15s",
                 transform: isSelected ? "scale(1.01)" : "scale(1)",
@@ -274,13 +274,13 @@ const PollCard = memo(function PollCard({ poll, token }: { poll: import("@/lib/a
                 <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
                   {isSelected && (
                     <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring", stiffness: 500 }}>
-                      <Check style={{ width: "16px", height: "16px", color: "#DC143C" }} />
+                      <Check style={{ width: "16px", height: "16px", color: "#FE9727" }} />
                     </motion.div>
                   )}
-                  <span style={{ fontWeight: isSelected ? 600 : 500, fontSize: "14px", color: isSelected ? "#8B0000" : "#333" }}>{opt.option_text}</span>
+                  <span style={{ fontWeight: isSelected ? 600 : 500, fontSize: "14px", color: isSelected ? "#000000" : "#333" }}>{opt.option_text}</span>
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                  <span style={{ fontSize: "14px", color: "#8B0000", fontWeight: 700, fontFamily: "monospace" }}>{pct.toFixed(1)}%</span>
+                  <span style={{ fontSize: "14px", color: "#000000", fontWeight: 700, fontFamily: "monospace" }}>{pct.toFixed(1)}%</span>
                   <span style={{ fontSize: "12px", color: "#999", fontFamily: "monospace" }}>({opt.vote_count})</span>
                 </div>
               </div>
@@ -293,8 +293,8 @@ const PollCard = memo(function PollCard({ poll, token }: { poll: import("@/lib/a
         <span style={{ color: "#999" }}>{totalVotes} total vote{totalVotes !== 1 ? "s" : ""}</span>
         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
           {voted && <span style={{ display: "flex", alignItems: "center", gap: "4px", color: "#22c55e", fontWeight: 500 }}><Check style={{ width: "14px", height: "14px" }} />Voted</span>}
-          <span style={{ display: "flex", alignItems: "center", gap: "4px", color: "#DC143C", fontSize: "11px", fontWeight: 500 }}>
-            <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#DC143C", animation: "pulse 2s infinite" }} />
+          <span style={{ display: "flex", alignItems: "center", gap: "4px", color: "#FE9727", fontSize: "11px", fontWeight: 500 }}>
+            <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#FE9727", animation: "pulse 2s infinite" }} />
             Auto-refreshing
           </span>
         </div>

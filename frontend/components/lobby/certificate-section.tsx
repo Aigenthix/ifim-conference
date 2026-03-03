@@ -83,7 +83,7 @@ export default function CertificateSection({ eventId }: { eventId: string }) {
             Please submit your feedback first to unlock<br />your participation certificate.
           </p>
           <p style={{ color: "#999", fontSize: "13px" }}>
-            Go to the <strong style={{ color: "#8B0000" }}>Feedback</strong> tab to share your experience.
+            Go to the <strong style={{ color: "#000000" }}>Feedback</strong> tab to share your experience.
           </p>
         </motion.div>
       </div>
@@ -116,7 +116,7 @@ export default function CertificateSection({ eventId }: { eventId: string }) {
                 display: "inline-flex", alignItems: "center", gap: "8px",
                 padding: "14px 28px", borderRadius: "14px", fontWeight: 700,
                 fontSize: "15px", color: "#fff", border: "none",
-                background: "linear-gradient(135deg, #8B0000, #DC143C)",
+                background: "#FE9727",
                 boxShadow: "0 4px 16px rgba(220,20,60,0.3)",
                 cursor: downloading ? "wait" : "pointer",
                 opacity: downloading ? 0.7 : 1,
