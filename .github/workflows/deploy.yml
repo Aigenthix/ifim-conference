@@ -19,7 +19,8 @@ jobs:
       - name: Build and start containers
         working-directory: ./backend
         run: |
-          sudo cp .env.production .env
+          sudo cp /home/ubuntu/ifim-conference/backend/.env.production .env
+          sudo cp /home/ubuntu/ifim-conference/frontend/.env.production ../frontend/.env.local || true
           sudo docker compose up -d --build
 
       - name: Wait for services to be healthy
