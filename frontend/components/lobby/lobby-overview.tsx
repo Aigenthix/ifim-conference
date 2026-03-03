@@ -237,11 +237,13 @@ export default function LobbyOverview({ lobby }: { lobby: EventLobby }) {
                 View / Download PDF ›
               </a>
             </div>
-            <iframe
-              src="/conference-paper-1.pdf"
-              style={{ width: "100%", height: "650px", border: "none", display: "block", backgroundColor: "#f8f9fa" }}
-              title="Bharat Synapse@2047 Paper"
-            />
+            <div style={{ width: "100%", overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
+              <iframe
+                src="/conference-paper-1.pdf#view=FitH&toolbar=0"
+                style={{ width: "100%", minWidth: "100%", height: "650px", border: "none", display: "block", backgroundColor: "#f8f9fa", maxWidth: "100vw" }}
+                title="Bharat Synapse@2047 Paper"
+              />
+            </div>
           </div>
 
           <div style={{ borderRadius: "16px", overflow: "hidden", border: "1px solid #eaeaea", boxShadow: "0 8px 24px rgba(0,0,0,0.06)", backgroundColor: "#fff" }}>
@@ -265,11 +267,13 @@ export default function LobbyOverview({ lobby }: { lobby: EventLobby }) {
                 View / Download PDF ›
               </a>
             </div>
-            <iframe
-              src="/conference-paper-2.pdf"
-              style={{ width: "100%", height: "650px", border: "none", display: "block", backgroundColor: "#f8f9fa" }}
-              title="Bharat Synapse Schedule"
-            />
+            <div style={{ width: "100%", overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
+              <iframe
+                src="/conference-paper-2.pdf#view=FitH&toolbar=0"
+                style={{ width: "100%", minWidth: "100%", height: "650px", border: "none", display: "block", backgroundColor: "#f8f9fa", maxWidth: "100vw" }}
+                title="Bharat Synapse Schedule"
+              />
+            </div>
           </div>
         </div>
       </Section>

@@ -273,11 +273,10 @@ export default function LobbyPage({ params }: { params: Promise<{ slug: string }
           color: #fff;
         }
 
-        .mobile-bottom-bar { display: none; overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch; scrollbar-width: none; scroll-snap-type: x proximity; }
-        .mobile-bottom-bar::-webkit-scrollbar { display: none; }
-        .mobile-tab-track { display: flex; align-items: center; gap: 6px; min-width: max-content; padding: 0 2px; }
-        .mobile-tab-btn { flex: 0 0 auto; min-width: 82px; max-width: 96px; scroll-snap-align: start; }
-        .mobile-tab-label { display: block; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .mobile-bottom-bar { display: none; width: 100%; z-index: 50; }
+        .mobile-tab-track { display: flex; align-items: center; justify-content: space-around; width: 100%; padding: 0; }
+        .mobile-tab-btn { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .mobile-tab-label { display: block; width: 100%; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .mobile-scroll-indicator { display: none !important; }
         .header-logo-text { display: block; }
 
