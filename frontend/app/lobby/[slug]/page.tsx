@@ -26,16 +26,16 @@ const ALERT_POLL_BASE_MS = 12_000;
 
 const SECTIONS = [
   { id: "overview", label: "Overview", icon: Home },
-  { id: "sessions", label: "Sessions", icon: Mic },
-  { id: "polls", label: "Live Polls", icon: BarChart3 },
-  { id: "strategy-compass", label: "Strategy Compass", icon: Compass },
-  { id: "alerts", label: "Alerts", icon: Bell },
-  { id: "gallery", label: "Gallery", icon: Image },
+  // { id: "sessions", label: "Sessions", icon: Mic },
+  // { id: "polls", label: "Live Polls", icon: BarChart3 },
+  // { id: "strategy-compass", label: "Strategy Compass", icon: Compass },
+  // { id: "alerts", label: "Alerts", icon: Bell },
+  // { id: "gallery", label: "Gallery", icon: Image },
   { id: "feedback", label: "Feedback", icon: MessageSquare },
   { id: "certificate", label: "Certificate", icon: Award },
-  { id: "qa", label: "Q&A", icon: HelpCircle },
-  { id: "community", label: "Community Chat", icon: MessageCircle },
-  { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
+  // { id: "qa", label: "Q&A", icon: HelpCircle },
+  // { id: "community", label: "Community Chat", icon: MessageCircle },
+  // { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
 ] as const;
 
 type Section = typeof SECTIONS[number]["id"];
@@ -373,20 +373,20 @@ export default function LobbyPage({ params }: { params: Promise<{ slug: string }
         <AnimatePresence mode="wait">
           <motion.div key={active} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }} transition={{ duration: 0.2 }}>
             {active === "overview" && <LobbyOverview lobby={lobby} />}
-            {active === "dashboard" && (
+            {/* {active === "dashboard" && (
               <DashboardSection eventSlug={lobby.slug} eventId={lobby.id} token={token ?? ""} />
-            )}
-            {active === "sessions" && <SessionsSection eventId={lobby.id} />}
+            )} */}
+            {/* {active === "sessions" && <SessionsSection eventId={lobby.id} />}
             {active === "polls" && <LivePolls eventId={lobby.id} />}
             {active === "strategy-compass" && (
               <StrategyCompassSection eventSlug={lobby.slug} token={token ?? ""} />
             )}
             {active === "alerts" && <AlertsSection eventId={lobby.id} />}
-            {active === "gallery" && <GallerySection eventId={lobby.id} />}
+            {active === "gallery" && <GallerySection eventId={lobby.id} />} */}
             {active === "feedback" && <FeedbackSection eventId={lobby.id} />}
             {active === "certificate" && <CertificateSection eventId={lobby.id} />}
-            {active === "qa" && <QASection eventId={lobby.id} />}
-            {active === "community" && <CommunityChatSection eventId={lobby.id} />}
+            {/* {active === "qa" && <QASection eventId={lobby.id} />}
+            {active === "community" && <CommunityChatSection eventId={lobby.id} />} */}
           </motion.div>
         </AnimatePresence>
       </main>

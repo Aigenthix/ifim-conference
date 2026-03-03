@@ -319,7 +319,7 @@ function getCuratedFaqAnswer(query: string): string | null {
   if (!normalized) return null;
 
   if (GREETINGS.some((g) => normalized === g || normalized.startsWith(g + " "))) {
-    return "Hello! Welcome to Raj Darbar 2026. How can I help you today? You can ask me about the schedule, speakers, or any event details.";
+    return "Hello! Welcome to Bharat Synapse@2047. How can I help you today? You can ask me about the schedule, speakers, or any event details.";
   }
 
   const direct = CURATED_FAQ_RULES.find((rule) =>
@@ -525,7 +525,7 @@ function ChatPanel({ eventId, token }: { eventId: string; token: string }) {
         </div>
         <div>
           <p style={{ fontWeight: 600, fontSize: "14px" }}>AI Event Assistant</p>
-          <p style={{ fontSize: "11px", opacity: 0.8 }}>Ask about RAJ DARBAR 2026</p>
+          <p style={{ fontSize: "11px", opacity: 0.8 }}>Ask about Bharat Synapse@2047</p>
         </div>
       </div>
 
