@@ -190,10 +190,10 @@ class FeedbackService:
         c.setFillColorRGB(0.3, 0.3, 0.3)
         c.drawCentredString(width / 2, height - 390, f"Date: {event_date}")
 
-        # Footer
+        # Footer — use current event title instead of stale hardcoded text
         c.setFont("Helvetica-Oblique", 12)
         c.setFillColorRGB(0.5, 0.5, 0.5)
-        c.drawCentredString(width / 2, 70, "RAJ DARBAR 2026 — Event Platform")
+        c.drawCentredString(width / 2, 70, event_title)
 
         c.save()
         buffer.seek(0)
