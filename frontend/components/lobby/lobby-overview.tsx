@@ -215,20 +215,23 @@ export default function LobbyOverview({ lobby }: { lobby: EventLobby }) {
 
       {/* Embedded Conference Papers */}
       <Section title="Conference Paper Presentation Details" icon={Calendar} delay={0.08}>
-        <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
-          <div style={{ borderRadius: "16px", overflow: "hidden", border: "1px solid #eee", boxShadow: "0 4px 16px rgba(0,0,0,0.05)" }}>
-            <div style={{ padding: "12px 16px", background: "#fafafa", borderBottom: "1px solid #eee", fontWeight: 600, fontSize: "14px", color: "#333", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-              <span>Bharat Synapse@2047 - Presentation Details</span>
+        <div style={{ display: "flex", flexDirection: "column", gap: "32px" }}>
+          <div style={{ borderRadius: "16px", overflow: "hidden", border: "1px solid #eaeaea", boxShadow: "0 8px 24px rgba(0,0,0,0.06)", backgroundColor: "#fff" }}>
+            <div style={{ padding: "16px 20px", display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: "12px", borderBottom: "1px solid #eaeaea", backgroundColor: "#fafafa" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                <span style={{ fontWeight: 700, fontSize: "15px", color: "#222" }}>Bharat Synapse@2047 - Presentation Details</span>
+              </div>
               <a
                 href="/conference-paper-1.pdf"
                 target="_blank"
                 rel="noopener noreferrer"
                 style={{
                   display: "inline-flex", alignItems: "center", gap: "6px",
-                  padding: "6px 14px", borderRadius: "8px",
+                  padding: "8px 16px", borderRadius: "10px",
                   background: "#FE9727", color: "#fff",
-                  fontSize: "12px", fontWeight: 600,
+                  fontSize: "13px", fontWeight: 600,
                   textDecoration: "none", whiteSpace: "nowrap",
+                  boxShadow: "0 2px 8px rgba(254,151,39,0.3)"
                 }}
               >
                 View / Download PDF ›
@@ -236,24 +239,27 @@ export default function LobbyOverview({ lobby }: { lobby: EventLobby }) {
             </div>
             <iframe
               src="/conference-paper-1.pdf"
-              style={{ width: "100%", height: "500px", border: "none", backgroundColor: "#f5f5f5" }}
+              style={{ width: "100%", height: "650px", border: "none", display: "block", backgroundColor: "#f8f9fa" }}
               title="Bharat Synapse@2047 Paper"
             />
           </div>
 
-          <div style={{ borderRadius: "16px", overflow: "hidden", border: "1px solid #eee", boxShadow: "0 4px 16px rgba(0,0,0,0.05)" }}>
-            <div style={{ padding: "12px 16px", background: "#fafafa", borderBottom: "1px solid #eee", fontWeight: 600, fontSize: "14px", color: "#333", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-              <span>Bharat Synapse Paper Schedule (Final)</span>
+          <div style={{ borderRadius: "16px", overflow: "hidden", border: "1px solid #eaeaea", boxShadow: "0 8px 24px rgba(0,0,0,0.06)", backgroundColor: "#fff" }}>
+            <div style={{ padding: "16px 20px", display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: "12px", borderBottom: "1px solid #eaeaea", backgroundColor: "#fafafa" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                <span style={{ fontWeight: 700, fontSize: "15px", color: "#222" }}>Bharat Synapse Paper Schedule (Final)</span>
+              </div>
               <a
                 href="/conference-paper-2.pdf"
                 target="_blank"
                 rel="noopener noreferrer"
                 style={{
                   display: "inline-flex", alignItems: "center", gap: "6px",
-                  padding: "6px 14px", borderRadius: "8px",
+                  padding: "8px 16px", borderRadius: "10px",
                   background: "#FE9727", color: "#fff",
-                  fontSize: "12px", fontWeight: 600,
+                  fontSize: "13px", fontWeight: 600,
                   textDecoration: "none", whiteSpace: "nowrap",
+                  boxShadow: "0 2px 8px rgba(254,151,39,0.3)"
                 }}
               >
                 View / Download PDF ›
@@ -261,7 +267,7 @@ export default function LobbyOverview({ lobby }: { lobby: EventLobby }) {
             </div>
             <iframe
               src="/conference-paper-2.pdf"
-              style={{ width: "100%", height: "500px", border: "none", backgroundColor: "#f5f5f5" }}
+              style={{ width: "100%", height: "650px", border: "none", display: "block", backgroundColor: "#f8f9fa" }}
               title="Bharat Synapse Schedule"
             />
           </div>
