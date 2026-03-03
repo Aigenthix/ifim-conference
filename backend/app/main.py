@@ -25,6 +25,9 @@ from app.core.logging import setup_logging
 from app.db.session import close_db, get_redis, init_db
 from app.websocket.manager import ws_manager
 import redis.asyncio as aioredis
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 @asynccontextmanager
