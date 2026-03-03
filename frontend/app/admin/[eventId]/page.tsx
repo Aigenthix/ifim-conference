@@ -73,8 +73,8 @@ export default function AdminDashboard({ params }: { params: Promise<{ eventId: 
     { id: "food", label: "Food", icon: UtensilsCrossed },
     { id: "adduser", label: "Add User", icon: UserPlus },
     { id: "feedback", label: "Feedback", icon: MessageSquare },
-    { id: "qa", label: "Q&A", icon: MessageCircle },
-    { id: "sessions", label: "Sessions", icon: Mic },
+    // { id: "qa", label: "Q&A", icon: MessageCircle },
+    // { id: "sessions", label: "Sessions", icon: Mic },
     { id: "alerts", label: "Alerts", icon: Bell },
     { id: "bulkemail", label: "Bulk Email", icon: Mail },
   ];
@@ -153,9 +153,9 @@ export default function AdminDashboard({ params }: { params: Promise<{ eventId: 
         {activeTab === "food" && <FoodAttendanceTab eventId={eventId} token={token} />}
         {activeTab === "adduser" && <AddUserTab eventId={eventId} token={token} />}
         {activeTab === "feedback" && <FeedbackTab eventId={eventId} token={token} />}
-        {activeTab === "sessions" && <SessionsTab eventId={eventId} token={token} />}
+        {/* {activeTab === "sessions" && <SessionsTab eventId={eventId} token={token} />} */}
         {activeTab === "alerts" && <AlertsTab eventId={eventId} token={token} />}
-        {activeTab === "qa" && <QATab eventId={eventId} token={token} />}
+        {/* {activeTab === "qa" && <QATab eventId={eventId} token={token} />} */}
         {activeTab === "bulkemail" && <BulkEmailTab eventId={eventId} token={token} />}
       </main>
     </div>
