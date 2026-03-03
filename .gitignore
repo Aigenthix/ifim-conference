@@ -1,9 +1,17 @@
 .env*
 .env
-avinash-aws.pem
-.pem
+*.pem
 *.csv
 *.xlsx
+*.pdf
+*.jpeg
+*.jpg
 old cetrificates/
 .DS_Store
 sql_patch.py
+RAJ DARBAR*
+Public/TEAM BEHIND/
+node_modules/
+.next/
+venv/
+__pycache__/
