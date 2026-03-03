@@ -213,6 +213,33 @@ export default function LobbyOverview({ lobby }: { lobby: EventLobby }) {
         </div>
       </motion.div>
 
+      {/* Embedded Conference Papers */}
+      <Section title="Conference Paper Presentation Details" icon={Calendar} delay={0.08}>
+        <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+          <div style={{ borderRadius: "16px", overflow: "hidden", border: "1px solid #eee", boxShadow: "0 4px 16px rgba(0,0,0,0.05)" }}>
+            <div style={{ padding: "12px 16px", background: "#fafafa", borderBottom: "1px solid #eee", fontWeight: 600, fontSize: "14px", color: "#333" }}>
+              Bharat Synapse@2047 - Presentation Details
+            </div>
+            <iframe
+              src="/conference-paper-1.pdf"
+              style={{ width: "100%", height: "500px", border: "none", backgroundColor: "#f5f5f5" }}
+              title="Bharat Synapse@2047 Paper"
+            />
+          </div>
+
+          <div style={{ borderRadius: "16px", overflow: "hidden", border: "1px solid #eee", boxShadow: "0 4px 16px rgba(0,0,0,0.05)" }}>
+            <div style={{ padding: "12px 16px", background: "#fafafa", borderBottom: "1px solid #eee", fontWeight: 600, fontSize: "14px", color: "#333" }}>
+              Bharat Synapse Paper Schedule (Final)
+            </div>
+            <iframe
+              src="/conference-paper-2.pdf"
+              style={{ width: "100%", height: "500px", border: "none", backgroundColor: "#f5f5f5" }}
+              title="Bharat Synapse Schedule"
+            />
+          </div>
+        </div>
+      </Section>
+
       {/* Schedule with Dropdowns */}
       {overview?.schedule && overview.schedule.length > 0 && (
         <Section title="Event Schedule" icon={Clock} delay={0.1}>
