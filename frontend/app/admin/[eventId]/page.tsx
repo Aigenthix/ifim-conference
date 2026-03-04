@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback, useMemo, useDeferredValue } f
 import { useRouter } from "next/navigation";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { motion } from "framer-motion";
+import jsQR from "jsqr";
 import {
   Users, BarChart3, Star, MessageSquare, Activity, TrendingUp, Award, Zap,
   Bell, Mic, Plus, Trash2, Send, LogOut, UserPlus, Gift, ClipboardList,
@@ -24,6 +25,38 @@ type BarcodeDetectorCtor = {
   new (options?: { formats?: string[] }): BarcodeDetectorInstance;
   getSupportedFormats?: () => Promise<string[]>;
 };
+
+async function detectQrPayload(
+  video: HTMLVideoElement,
+  detector: BarcodeDetectorInstance | null,
+  frameCanvas: HTMLCanvasElement,
+  frameCtx: CanvasRenderingContext2D | null,
+): Promise<string | null> {
+  if (detector) {
+    try {
+      const codes = await detector.detect(video);
+      const rawValue = codes.find((code) => code.rawValue?.trim())?.rawValue?.trim();
+      if (rawValue) return rawValue;
+    } catch {
+      // Ignore BarcodeDetector errors and fallback to jsQR decode.
+    }
+  }
+
+  if (!frameCtx || video.videoWidth === 0 || video.videoHeight === 0) return null;
+
+  if (frameCanvas.width !== video.videoWidth || frameCanvas.height !== video.videoHeight) {
+    frameCanvas.width = video.videoWidth;
+    frameCanvas.height = video.videoHeight;
+  }
+
+  frameCtx.drawImage(video, 0, 0, frameCanvas.width, frameCanvas.height);
+  const imageData = frameCtx.getImageData(0, 0, frameCanvas.width, frameCanvas.height);
+  const decoded = jsQR(imageData.data, frameCanvas.width, frameCanvas.height, {
+    inversionAttempts: "attemptBoth",
+  });
+
+  return decoded?.data?.trim() || null;
+}
 
 const ATTENDANCE_PAGE_SIZE = 50;
 const EMPTY_ATTENDEES: Array<{
@@ -329,24 +362,28 @@ function AttendanceTab({ eventId, token }: { eventId: string; token: string }) {
       }
 
       const detectorCtor = (window as Window & { BarcodeDetector?: BarcodeDetectorCtor }).BarcodeDetector;
-      if (!detectorCtor) {
-        setScannerError("Auto QR detection is not supported here. Use manual QR payload input.");
-        return;
-      }
-
-      if (detectorCtor.getSupportedFormats) {
-        try {
-          const formats = await detectorCtor.getSupportedFormats();
-          if (!formats.includes("qr_code")) {
-            setScannerError("This browser camera does not support QR format detection.");
-            return;
+      let detector: BarcodeDetectorInstance | null = null;
+      if (detectorCtor) {
+        let supportsQrFormat = true;
+        if (detectorCtor.getSupportedFormats) {
+          try {
+            const formats = await detectorCtor.getSupportedFormats();
+            supportsQrFormat = formats.includes("qr_code");
+          } catch {
+            // Some browsers throw while still supporting detection.
           }
-        } catch {
-          // Continue; some browsers throw while still supporting detection.
+        }
+        if (supportsQrFormat) {
+          detector = new detectorCtor({ formats: ["qr_code"] });
         }
       }
 
-      const detector = new detectorCtor({ formats: ["qr_code"] });
+      const frameCanvas = document.createElement("canvas");
+      const frameCtx = frameCanvas.getContext("2d", { willReadFrequently: true });
+      if (!detector && !frameCtx) {
+        setScannerError("QR detection is not supported here. Use manual QR payload input.");
+        return;
+      }
 
       const scanFrame = async () => {
         if (!videoRef.current) return;
@@ -359,8 +396,7 @@ function AttendanceTab({ eventId, token }: { eventId: string; token: string }) {
 
         try {
           if (videoRef.current.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
-            const codes = await detector.detect(videoRef.current);
-            const rawValue = codes.find((code) => code.rawValue?.trim())?.rawValue?.trim();
+            const rawValue = await detectQrPayload(videoRef.current, detector, frameCanvas, frameCtx);
             if (rawValue) {
               scannerBusyRef.current = true;
               try {
@@ -1990,11 +2026,28 @@ function FoodAttendanceTab({ eventId, token }: { eventId: string; token: string 
       }
 
       const detectorCtor = (window as Window & { BarcodeDetector?: BarcodeDetectorCtor }).BarcodeDetector;
-      if (!detectorCtor) {
+      let detector: BarcodeDetectorInstance | null = null;
+      if (detectorCtor) {
+        let supportsQrFormat = true;
+        if (detectorCtor.getSupportedFormats) {
+          try {
+            const formats = await detectorCtor.getSupportedFormats();
+            supportsQrFormat = formats.includes("qr_code");
+          } catch {
+            // Some browsers throw while still supporting detection.
+          }
+        }
+        if (supportsQrFormat) {
+          detector = new detectorCtor({ formats: ["qr_code"] });
+        }
+      }
+
+      const frameCanvas = document.createElement("canvas");
+      const frameCtx = frameCanvas.getContext("2d", { willReadFrequently: true });
+      if (!detector && !frameCtx) {
         setScannerError("QR detection not supported. Use manual input below.");
         return;
       }
-      const detector = new detectorCtor({ formats: ["qr_code"] });
 
       const scanFrame = async () => {
         if (!videoRef.current || scannerBusyRef.current) {
@@ -2003,8 +2056,7 @@ function FoodAttendanceTab({ eventId, token }: { eventId: string; token: string 
         }
         try {
           if (videoRef.current.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
-            const codes = await detector.detect(videoRef.current);
-            const raw = codes.find((c) => c.rawValue?.trim())?.rawValue?.trim();
+            const raw = await detectQrPayload(videoRef.current, detector, frameCanvas, frameCtx);
             if (raw) {
               scannerBusyRef.current = true;
               try { await handleScanPayload(raw); } catch { scannerBusyRef.current = false; }
